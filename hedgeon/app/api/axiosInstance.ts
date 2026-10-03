@@ -4,7 +4,7 @@
 import axios, { AxiosInstance, AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 
 // const baseURL = "http://localhost:3500/api/v1/";
-const baseURL = "https://hedgeon-finance-1.onrender.com/api/v1/";
+const baseURL = "https://hedgeon-finance-i9bz.onrender.com/api/v1/";
 
 const axiosInstance: AxiosInstance = axios.create({
     baseURL,
