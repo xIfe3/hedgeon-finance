@@ -3,11 +3,16 @@ import { updateProfileApi, uploadProfilePictureApi } from '@/app/api/userApi';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/context/UserContext';
 import React, { useEffect, useState } from 'react';
+import { motion } from "framer-motion";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, CheckCircle } from "lucide-react";
 
 // User Details Section
 const UploadImage = () => {
     const [image, setImage] = useState<string | null>(null);
     const [file, setFile] = useState<File | null>(null);
+
+    const { user } = useUser()
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const uploadedFile = event.target.files?.[0];
@@ -44,7 +49,7 @@ const UploadImage = () => {
                 <div
                     className="rounded-full w-full h-full bg-cover bg-center"
                     style={{
-                        backgroundImage: `url(${image || "https://via.placeholder.com/150?text=No+Image"})`,
+                        backgroundImage: `url(${user?.profilePicture || "https://via.placeholder.com/150?text=No+Image"})`,
                     }}
                 ></div>
             </div>
@@ -88,82 +93,102 @@ const UploadImage = () => {
 function UserProfile() {
     const { updateUser, refreshUser, user } = useUser();
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<boolean>(false);
 
-    const [userData, setUserData] = useState<{ name: string, email: string, phone: string }>({
+    const [userData, setUserData] = useState<{ name: string; email: string; phone: string }>({
         name: "",
         email: "",
         phone: "",
     });
 
-
     useEffect(() => {
         if (user) {
-            userData.name = user.name || "";
-            userData.email = user.email || "";
-            userData.phone = user.phone || "";
+            setUserData({
+                name: user.name || "",
+                email: user.email || "",
+                phone: user.phone || "",
+            });
         }
     }, [user]);
 
-    if (!user) {
-        return <div>Loading...</div>;
-    }
+    if (!user) return <div>Loading user...</div>;
 
-    type FormFields = keyof typeof userData;
-
-    const fields: {
-        name: FormFields;
-        label: string;
-        placeholder: string;
-        required?: boolean;
-        readOnly?: boolean;
-        type: string;
-    }[] = [
-            {
-                name: "name",
-                label: "Name",
-                placeholder: "Enter your full name",
-                required: true,
-                type: "text",
-            },
-            {
-                name: "email",
-                label: "Email Address",
-                placeholder: "Enter your email address",
-                type: "email",
-                readOnly: true,
-            },
-            {
-                name: "phone",
-                label: "Phone Number",
-                placeholder: "Enter your phone",
-                required: true,
-                type: "text",
-                readOnly: true,
-            },
-        ];
+    const fields = [
+        {
+            name: "name",
+            label: "Name",
+            placeholder: "Enter your full name",
+            required: true,
+            type: "text",
+            readOnly: false,
+        },
+        {
+            name: "email",
+            label: "Email Address",
+            placeholder: "Enter your email address",
+            type: "email",
+            readOnly: true,
+        },
+        {
+            name: "phone",
+            label: "Phone Number",
+            placeholder: "Enter your phone",
+            type: "text",
+            readOnly: true,
+        },
+    ] as const;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        console.log('User Data', userData);
         setLoading(true);
+        setError(null);
+        setSuccess(false);
 
         try {
             const response = (await updateProfileApi(userData)).data;
-            console.log("Response from API", response);
-            const { updated_user } = response;
-            updateUser(updated_user);
+            updateUser(response.updated_user);
             refreshUser();
-        } catch (err) {
-            console.log("Error updating profile", err);
+            setSuccess(true);
+        } catch (err: any) {
+            console.error("Error updating profile:", err);
+            setError("Failed to update profile. Please try again.");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="space-y-2 w-3/4">
-            <div className="bg-white p-10 rounded space-y-10">
+        <div className="space-y-4 w-full">
+            {error && (
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 bg-red-50 border border-red-100 rounded-sm flex items-center space-x-3"
+                >
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4 text-red-600" />
+                        <AlertTitle>Error</AlertTitle>
+                        <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                </motion.div>
+            )}
+
+            {success && (
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 bg-green-50 border border-green-100 rounded-sm flex items-center space-x-3"
+                >
+                    <Alert variant="default">
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <AlertTitle>Success</AlertTitle>
+                        <AlertDescription>Profile updated successfully.</AlertDescription>
+                    </Alert>
+                </motion.div>
+            )}
+
+            <div className="bg-white p-10 rounded-xl shadow-sm space-y-10">
                 <UploadImage />
 
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -179,25 +204,26 @@ function UserProfile() {
                                 id={field.name}
                                 name={field.name}
                                 placeholder={field.placeholder}
-                                value={userData[field.name] || ""}
+                                value={userData[field.name]}
                                 onChange={(e) => setUserData({ ...userData, [field.name]: e.target.value })}
-                                required={field.required}
-                                readOnly={field.readOnly}
+                                readOnly={field?.readOnly}
                                 className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
-                            {(field.name === "email" || field.name === 'phone') && (
+                            {(field.name === "email" || field.name === "phone") && (
                                 <p className="text-sm text-gray-500">
-                                    Contact support to change your {field.name.includes('email') ? "email" : "phone number"}.
+                                    Contact support to change your {field.name === "email" ? "email" : "phone number"}.
                                 </p>
                             )}
                         </div>
                     ))}
 
-                    <Button type='submit'>UPDATE</Button>
+                    <Button type="submit" disabled={loading} className="w-full">
+                        {loading ? "Updating..." : "Update"}
+                    </Button>
                 </form>
             </div>
         </div>
     );
 }
 
-export default UserProfile
+export default UserProfile;

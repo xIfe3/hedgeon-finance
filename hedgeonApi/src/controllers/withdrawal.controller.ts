@@ -1,10 +1,10 @@
 import { Request, Response } from "../utils/Types";
 import withdrawalModel from "../models/withdrawal.model";
 import asynchHandler from "express-async-handler";
-import { emailService } from "..";
 import { logData, logError } from "../utils/logger";
 import { getUserById } from "../services/user.service";
 import { BadRequestError } from "../utils/errors";
+import sendEmail from "../utils/mailer";
 
 export const withdrawalHandler = asynchHandler(
     async (req: Request, res: Response) => {
@@ -13,10 +13,13 @@ export const withdrawalHandler = asynchHandler(
         // Get user details
         const user = await getUserById(req.session.user.id);
 
-        // Validate that the user has sufficient funds for the withdrawal
+        // Validate sufficient funds
         if (user.walletBalance < amount) {
             return logError(res, new BadRequestError("Insufficient wallet balance to withdraw"));
         }
+
+        // Deduct funds
+        user.walletBalance -= amount;
 
         // Create withdrawal record
         const withdrawal = await withdrawalModel.create({
@@ -26,20 +29,43 @@ export const withdrawalHandler = asynchHandler(
             walletAddress
         });
 
-        // Send notifications if withdrawal is successful
-        if (withdrawal) {
-            await Promise.all([
-                emailService.sendWithdrawalRequest(user, amount),
-                emailService.notifyAdminAboutWithdrawal(
-                    user,
-                    amount
-                ),
-            ]);
+        // Add notification
+        const notificationMessage = `You initiated a withdrawal of $${amount} in ${currency} to wallet address: ${walletAddress}. It is currently pending verification.`;
+        user.notifications.push({
+            message: notificationMessage,
+            type: 'withdrawal',
+            date: new Date(),
+            read: false
+        });
+
+        try {
+            // Save updated user data with new balance and notification
+            await user.save();
+
+            // Send withdrawal email
+            await sendEmail(
+                user.email,
+                'Withdrawal Request Received',
+                'withdrawalNotification',
+                {
+                    userName: user.name || 'User',
+                    amount,
+                    currency,
+                    walletAddress,
+                    message: notificationMessage,
+                    date: new Date().toDateString()
+                }
+            );
+        } catch (error) {
+            console.error('Failed to send withdrawal notification or email:', error);
         }
 
-        return logData(res, 201, { withdrawal });
+        return logData(res, 201, {
+            message: "Your withdrawal request has been received and is pending verification. You will be notified once it is processed."
+        });
     }
 );
+
 
 export const getAllWithdrawals = asynchHandler(
     async (req: Request, res: Response) => {

@@ -8,17 +8,37 @@ interface IUser {
     phone: string,
     password: string,
     role: 'user' | 'admin',
-    kyc: string,
-    twoFactorSecret: string,
+    isMerchant: boolean;
+    isPendingMerchantVerification: boolean;
+    kycVerified: boolean,
+    isPendingKYCVerified: boolean,
     currentPlan?: [{
         planId: mongoose.Types.ObjectId;
+        investmentId: mongoose.Types.ObjectId;
         name: string;
         startDate: Date;
         endDate: Date;
         daysGone: number;
         investedAmount: number;
         roiAccumulated: number;
+        status: string;
     }];
+    pastPlans: [{
+        planId: mongoose.Types.ObjectId;
+        investmentId: mongoose.Types.ObjectId;
+        name: string;
+        startDate: Date;
+        endDate: Date;
+        investedAmount: number;
+        roiAccumulated: number;
+        status: string;
+    }]
+    notifications: [{
+        message: string,
+        type: string,
+        date: Date,
+        read: boolean
+    }],
     walletBalance: number
     totalInvested: number;   // Track the total amount invested
     netReturns: number;      // Track the net returns
@@ -69,12 +89,28 @@ const userSchema = new mongoose.Schema<IUser>({
         type: String,
         default: 'user'
     },
-    kyc: String,
-    twoFactorSecret: String,
+    isMerchant: {
+        type: Boolean,
+        default: false
+    },
+    isPendingMerchantVerification: {
+        type: Boolean,
+        default: false
+    },
+    isPendingKYCVerified: {
+        type: Boolean,
+        default: false
+    },
+    kycVerified: { type: Boolean, default: false },
     currentPlan: [{
         planId: {
             type: mongoose.Types.ObjectId,
             ref: "Plan",
+            default: null,
+        },
+        investmentId: {
+            type: mongoose.Types.ObjectId,
+            ref: "Investment",
             default: null,
         },
         name: { type: String, default: null },
@@ -83,6 +119,32 @@ const userSchema = new mongoose.Schema<IUser>({
         daysGone: { type: Number, default: 0 },
         investedAmount: { type: Number, default: 0 },
         roiAccumulated: { type: Number, default: 0 },
+        status: { type: String, default: null },
+
+    }],
+    pastPlans: [{
+        planId: {
+            type: mongoose.Types.ObjectId,
+            ref: "Plan",
+            default: null,
+        },
+        investmentId: {
+            type: mongoose.Types.ObjectId,
+            ref: "Investment",
+            default: null,
+        },
+        name: { type: String, default: null },
+        startDate: { type: Date, default: null },
+        endDate: { type: Date, default: null },
+        investedAmount: { type: Number, default: 0 },
+        roiAccumulated: { type: Number, default: 0 },
+        status: { type: String, default: null },
+    }],
+    notifications: [{
+        message: String,
+        type: { type: String }, // e.g., 'roi', 'deposit', etc.
+        date: { type: Date, default: Date.now },
+        read: { type: Boolean, default: false }
     }],
     walletBalance: {
         type: Number,

@@ -1,34 +1,47 @@
-import { Bell, Lock, User2Icon, Verified } from 'lucide-react';
+import { Bell, Lock, Settings, User2Icon, Verified } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react'
 
-const ListItem = ({ link }: any) => {
+interface LinkItem {
+    path: string;
+    name: string;
+    icon: React.ReactNode;
+}
+
+interface ListItemProps {
+    link: LinkItem;
+}
+
+const ListItem = ({ link }: ListItemProps) => {
     return (
         <Link
             href={link.path}
-            className={`space-x-2 px-3 py-2 rounded border-r-4 flex hover:bg-gray-100 hover:border-gray-300 transition-all duration-200 ease-in-out`}
             key={link.name}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg border border-transparent hover:border-gray-200 hover:bg-gray-50 transition-all duration-200 group"
         >
-            {link.icon}
-            <span>{link.name}</span>
+            <span className="text-gray-600 group-hover:text-primary-600">{link.icon}</span>
+            <span className="text-sm font-medium text-gray-800 group-hover:text-primary-600">{link.name}</span>
         </Link>
     );
 };
 
-const NavigationBox = ({ links }: any) => {
+interface NavigationBoxProps {
+    links: LinkItem[];
+}
 
+const NavigationBox = ({ links }: NavigationBoxProps) => {
     return (
-        <div className="p-5 rounded shadow-lg md:w-1/4 max-h-fit bg-white">
+        <div className="p-6 rounded-sm w-full md:w-1/4 bg-white space-y-3 h-fit md:border-none border-b">
+            <h2 className="text-lg font-semibold text-gray-700 border-b pb-2 mb-3">Navigation</h2>
             <div className="space-y-2">
-                {links.map((link: any) => (
-                    <ListItem
-                        link={link}
-                    />
+                {links.map((link) => (
+                    <ListItem key={link.name} link={link} />
                 ))}
             </div>
         </div>
     );
 };
+
 
 
 function SettingsLayout({ children }: { children: React.ReactNode }) {
@@ -44,22 +57,19 @@ function SettingsLayout({ children }: { children: React.ReactNode }) {
             icon: <Verified />,
         },
         {
-            name: "Security",
-            path: "/personal/profile/change-password",
-            icon: <Lock />,
-        },
-        {
-            name: "Notification",
-            path: "/personal/profile/notifications",
-            icon: <Bell />,
+            name: "Settings",
+            path: "/personal/profile/settings",
+            icon: <Settings />,
         },
     ];
 
     return (
-        <div className="flex space-x-10 md:flex-row flex-col">
+        <div className="flex space-x-10 md:flex-row flex-col md:space-y-0 space-y-5">
             <NavigationBox links={links} />
 
-            {children}
+            <main className="md:w-3/4 w-full">
+                {children}
+            </main>
         </div>
     );
 }

@@ -6,7 +6,7 @@ import Footer from "@/components/public/Footer";
 
 export function PathWrapper({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
-    const showHeader = !pathname.startsWith("/admin") && !pathname.startsWith("/personal");
+    const showHeader = !pathname.startsWith("/admin") && !pathname.startsWith("/personal") && !pathname.startsWith("/auth");
 
     return (
         <>

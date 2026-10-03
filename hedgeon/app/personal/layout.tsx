@@ -1,19 +1,28 @@
 import DashboardHeader from "@/components/personal/Header";
 import DashboardSidebar from "@/components/personal/Sidebar";
 import ProtectedLayout from "../ProtectedLayout";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import TawkToScript from "@/components/public/TawkScript";
+import { KYCBanner } from "@/components/personal/KYCBanner"; // New component
 
-const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
     return (
         <ProtectedLayout allowedRoles={['user']}>
-            <div className="flex">
+            <SidebarProvider>
                 <DashboardSidebar />
-                <main className="flex-1 p-8 bg-gray-50 min-h-screen">
+                <main className="flex-1 bg-gray-50 min-h-screen">
                     <DashboardHeader />
-                    {children}
+                    <KYCBanner />
+
+                    <SidebarTrigger className="sticky top-16 md:hidden block" size={'lg'} />
+                    <div className="p-2">
+                        {children}
+                        <TawkToScript />
+                    </div>
                 </main>
-            </div>
+            </SidebarProvider>
         </ProtectedLayout>
     );
 };
 
-export default DashboardLayout
+export default DashboardLayout;

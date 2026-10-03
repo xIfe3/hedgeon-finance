@@ -3,8 +3,9 @@ import React from 'react'
 import {
     PieChart, Check, ArrowRight, Briefcase, Building2,
     DollarSign,
-    UserPlus,
 } from "lucide-react"
+import Link from 'next/link'
+import Image from 'next/image'
 
 function page() {
     const whyPMSItems = [
@@ -62,13 +63,12 @@ function page() {
         <div className="min-h-screen bg-gray-50">
             <BreadcrumbsSection
                 title="Services"
-                description="Explore the latest advancements in web technologies and best practices for building scalable applications in 2024."
             />
 
             <section className="space-y-24 py-20 bg-gradient-to-b from-slate-950 via-sky-950 to-indigo-950">
                 <div className="max-w-7xl mx-auto px-6 space-y-20">
                     {/* PMS Section */}
-                    <div className="relative bg-gradient-to-br from-slate-800/50 to-blue-900/30 rounded-[3rem] p-12 border border-sky-800/30 shadow-2xl overflow-hidden">
+                    <div className="relative bg-gradient-to-br from-slate-800/50 to-blue-900/30 rounded-[3rem] p-5 md:p-12 border border-sky-800/30 shadow-2xl overflow-hidden">
                         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10"></div>
                         <div className="relative z-10">
                             <div className="flex items-start gap-6 mb-8">
@@ -76,7 +76,7 @@ function page() {
                                     <PieChart className="w-12 h-12 text-sky-400" />
                                 </div>
                                 <div>
-                                    <h2 className="text-4xl font-bold bg-gradient-to-r from-sky-300 to-cyan-400 bg-clip-text text-transparent mb-2">
+                                    <h2 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-sky-300 to-cyan-400 bg-clip-text text-transparent mb-2">
                                         Portfolio Management Services (PMS)
                                     </h2>
                                     <div className="h-1 w-24 bg-sky-400/30 rounded-full mb-6"></div>
@@ -92,12 +92,12 @@ function page() {
                                         </p>
                                     </div>
 
-                                    <button className="w-full bg-gradient-to-r from-sky-500 to-cyan-600 px-8 py-4 rounded-xl font-semibold hover:shadow-2xl transition-all group">
-                                        <span className="flex items-center justify-center gap-3">
+                                    <Link href="/auth/signup" className="w-full">
+                                        <span className="flex items-center justify-center gap-3 bg-orange-700 text-white w-fit px-4 py-3 rounded-sm">
                                             Open Live Account
                                             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                         </span>
-                                    </button>
+                                    </Link>
                                 </div>
 
                                 <div className="bg-slate-900/40 p-8 rounded-2xl border border-sky-800/30">
@@ -121,22 +121,28 @@ function page() {
                     </div>
 
                     {/* Mutual Funds & IPOs */}
-                    <div className="bg-slate-900/40 p-12 rounded-3xl border border-purple-800/30 shadow-xl">
+                    <div className="bg-slate-900/40  p-5 md:p-12 rounded-3xl border border-purple-800/30 shadow-xl">
                         <div className="flex items-center gap-6 mb-10">
                             <DollarSign className="w-12 h-12 text-purple-400" />
-                            <h2 className="text-4xl font-bold text-purple-200">Mutual Funds & IPOs</h2>
+                            <h2 className="text-2xl md:text-4xl font-bold text-purple-200">Mutual Funds & IPOs</h2>
                         </div>
 
-                        <div className="grid lg:grid-cols-2 gap-8 mb-12">
-                            <p className="text-slate-300 leading-relaxed">
-                                Mutual Funds and Initial Public Offerings (IPOs) offer an opportunity to invest in a diversified, professionally managed basket of securities at a relatively low cost. They provide liquidity and transparency while helping you build a diversified portfolio.
+                        <div className="">
+                            <p className="text-slate-300 leading-relaxed mb-4">
+                                Mutual Funds and Initial Public Offerings (IPOs)offer an opportunity to invest in a diversified,
+                                professionally managed basket of securities at a relatively low cost. They are an excellent option for
+                                clients who are looking for a diversified investment portfolio offering liquidity and transparency.
+                                Fundacion Finance provides comprehensive transaction support to its clients for undertaking
+                                investments in the primary markets via mutual funds & IPOs.
                             </p>
-                            <p className="text-gray-400 mb-4 leading-relaxed">
-                                Fundacion Finance provides comprehensive transaction support for primary market investments via mutual funds and IPOs. We offer personalized services for a range of mutual funds, including Equity funds, Growth and Value Funds, Large-Cap and Small-Cap Funds, Bond Funds, Foreign Stock Funds, Money Market Funds, Sector Funds, and Asset Allocation Funds.
+                            <p className="text-gray-300 mb-4 leading-relaxed">
+                                We, at Fundacion Finance we offer personalized services for investments (including mutual funds of
+                                all types: Equity funds, Growth and Value Funds, Large- Cap and Small-Cap Funds, Bond Fund,
+                                Foreign Stocks Funds, Money Market Funds, Sector Funds & Asset Allocation Funds) & IPOs.
                             </p>
                             <div className="bg-slate-800/30 p-6 rounded-xl">
                                 <h4 className="text-lg font-semibold text-purple-300 mb-4">Fund Types We Offer:</h4>
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     {fundTypes.map((type) => (
                                         <div key={type} className="flex items-center gap-2 text-slate-300">
                                             <Check className="w-4 h-4 text-emerald-400" />
@@ -146,22 +152,25 @@ function page() {
                                 </div>
                             </div>
                         </div>
-
-                        <button className="bg-gradient-to-r from-purple-500 to-fuchsia-600 px-8 py-4 rounded-xl font-semibold hover:shadow-xl transition-all w-full lg:w-auto">
-                            Build Your Portfolio in Minutes
-                        </button>
                     </div>
 
                     {/* Merchant Program */}
-                    <div className="bg-gradient-to-br from-slate-900 to-emerald-900/20 p-12 rounded-3xl border border-emerald-800/30">
+                    <div className="bg-gradient-to-br from-slate-900 to-emerald-900/20  p-5 md:p-12 rounded-3xl border border-emerald-800/30">
                         <div className="flex items-center gap-6 mb-10">
                             <Briefcase className="w-12 h-12 text-emerald-400" />
-                            <h2 className="text-4xl font-bold text-emerald-200">Merchant Program & Services</h2>
+                            <h2 className="text-2xl md:text-4xl font-bold text-emerald-200">Merchant Program & Financial Services</h2>
                         </div>
 
                         <div className="grid lg:grid-cols-2 gap-8 mb-12">
                             <p className="text-slate-300 leading-relaxed">
-                                Our highly qualified and experienced staff provide independent advice on key financial services, including pensions, inheritance tax, life assurance and protection, health insurance, employee benefits, investments, business protection, and wealth planning. We help companies pivot into more profitable directions, expand and grow, and correct past mistakes to optimize their ventures.
+                                Highly qualified and experienced staff give independent advice on such financial services as
+                                pensions, inheritance tax, life assurance and protection, health insurance, employee benefits,
+                                investments, business protection and wealth planning. We help companies pivot into more
+                                profitable directions where they can expand and grow. It is inevitable that individuals and companies
+                                will end up making a few mistakes; we help them correct these mistakes.
+                                We help companies turnaround their non-profitable ventures into something that benefits them. Our
+                                specialty lies in understanding what makes a company special and what makes it tick.
+
                             </p>
                             <div className="space-y-8">
                                 {merchantServices.map((service) => (
@@ -171,64 +180,205 @@ function page() {
                                     </div>
                                 ))}
                             </div>
+
+                            <Link href="/auth/login?redirect=/personal/merchant/apply" className='px-5 py-3 font-medium bg-amber-600 rounded-sm w-fit'>Become a Merchant</Link>
                         </div>
 
-                        <button className="bg-emerald-500/20 px-8 py-4 rounded-xl border border-emerald-400/30 hover:bg-emerald-500/30 transition-all flex items-center gap-3">
-                            <UserPlus className="w-6 h-6 text-emerald-400" />
-                            Become a Merchant
-                        </button>
                     </div>
 
-                    <div className="bg-gradient-to-br from-slate-900 to-emerald-900/20 p-12 rounded-3xl border border-emerald-800/30">
+                    <div className="bg-gradient-to-br from-slate-900 to-emerald-900/20  p-5 md:p-12 rounded-3xl border border-emerald-800/30">
                         <div className="flex items-center gap-6 mb-10">
                             <Briefcase className="w-12 h-12 text-emerald-400" />
-                            <h2 className="text-4xl font-bold text-emerald-200">Copy Trading & Signal Subscription Service</h2>
+                            <h2 className="text-2xl md:text-4xl font-bold text-emerald-200">Copy Trading & Signal Subscription Service</h2>
                         </div>
 
-                        <div className="grid lg:grid-cols-2 gap-8 mb-12">
-                            <p className="text-slate-300 leading-relaxed">
-                                At Hedgeon Finance, we understand that not every investor has the time or expertise to actively trade in the markets. Our service allows you to benefit from expert trading strategies and market insights.
-                            </p>
-                            <div className="space-y-8">
-                                {copyTrading.map((service) => (
-                                    <div key={service.title} className="bg-slate-800/30 p-6 rounded-xl border border-emerald-800/30">
-                                        <h4 className="text-lg font-semibold text-emerald-300 mb-3">{service.title}</h4>
-                                        <p className="text-slate-300">{service.description}</p>
-                                    </div>
-                                ))}
+                        <div className="flex md:flex-row flex-col justify-between gap-12">
+                            <div className="space-y-3 lg:w-1/2">
+                                <p className="text-slate-300 leading-relaxed">
+                                    At Hedgeon Finance, we understand that not every investor has the time or expertise to actively
+                                    trade the markets. That’s why we offer a <span className="font-bold text-primary">Copy Trading & Signal Subscription Service</span>, allowing
+                                    traders to benefit from our expert trading strategies and market insights—whether they trade with
+                                    us or another broker.
+                                </p>
+                                <p className='text-slate-300 leading-relaxed'>
+                                    Copy trading allows investors to automatically replicate the trades of our expert traders in realtime. This service is ideal for:
+                                </p>
+                                <ul className="space-y-3">
+                                    {[
+                                        'Investors who want to profit from the markets but lack trading experience',
+                                        'Busy professionals who prefer passive income opportunities',
+                                        'Traders looking to diversify their strategies by following proven experts'
+                                    ].map((insight, index) => (
+                                        <li
+                                            key={index}
+                                            className="group relative transition-all duration-300 hover:-translate-y-0.5"
+                                        >
+                                            {/* Pulsing outer glow */}
+                                            <div className="absolute -inset-1 rounded-xl bg-emerald-500/20 opacity-0 transition-opacity duration-300 group-hover:opacity-30 animate-pulse"></div>
+
+                                            {/* Main content */}
+                                            <div className="relative flex space-x-3 items-start p-3 rounded-lg bg-gray-800/50 backdrop-blur-sm border border-gray-700 transition-all duration-300 group-hover:border-emerald-500/30">
+                                                {/* Animated checkmark container */}
+                                                <div className="flex-shrink-0 pt-0.5">
+                                                    <span className="flex items-center justify-center h-6 w-6 rounded-full bg-emerald-500/20 ring-1 ring-emerald-500/30 transition-all duration-300 group-hover:bg-emerald-500/30 group-hover:ring-emerald-500/50">
+                                                        <Check className="h-4 w-4 text-emerald-400 transition-transform duration-300 group-hover:scale-110" />
+                                                    </span>
+                                                </div>
+
+                                                {/* Text content with hover effects */}
+                                                <p className="text-gray-300 text-sm leading-relaxed transition-colors duration-300 group-hover:text-white">
+                                                    {insight}
+                                                    <span className="ml-2 text-emerald-400 opacity-0 transition-all duration-300 group-hover:opacity-100">
+                                                        →
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <p className='text-slate-300 leading-relaxed'>
+                                    Already trading with another broker? No problem! Our premium Trading Signal Subscription allows
+                                    you to receive expert trade alerts and execute them manually on your preferred platform.
+                                </p>
+                                <ul className="space-y-4">
+                                    {[
+                                        { title: 'Daily & Weekly Market Signals', content: 'Actionable trade setups for forex, stocks, and crypto' },
+                                        { title: 'Entry, Exit & Stop Loss Levels', content: 'Clear instructions to maximize profit and minimize risk' },
+                                        { title: 'Real-Time Alerts', content: 'Receive signals via email, SMS, or our mobile app' },
+                                        { title: 'Market Insights & Strategy Reports', content: 'Exclusive access to in-depth technical and fundamental analysis.' },
+                                    ].map(({ title, content }, index) => (
+                                        <li className="group relative" key={index}>
+                                            <div className="absolute -inset-1 rounded-lg bg-emerald-500/20 opacity-20 transition-all duration-300 group-hover:opacity-30 animate-pulse"></div>
+
+                                            <div className="relative flex space-x-3 items-start p-4 rounded-lg bg-gray-800/50 backdrop-blur-sm transition-all duration-300 hover:bg-gray-700/50">
+                                                <div className="flex-shrink-0">
+                                                    <span className="flex items-center justify-center h-6 w-6 rounded-full bg-emerald-500/20 ring-2 ring-emerald-500/30 transition-all duration-300 group-hover:ring-emerald-500/50">
+                                                        <Check className="h-4 w-4 text-emerald-400 transition-transform duration-300 group-hover:scale-110" />
+                                                    </span>
+                                                </div>
+
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="text-sm font-medium text-gray-100 transition-colors duration-300 group-hover:text-white">
+                                                        {title}
+                                                        <span className="ml-2 text-emerald-400 opacity-0 transition-all duration-300 group-hover:opacity-100">
+                                                            ✓
+                                                        </span>
+                                                    </p>
+                                                    <p className="mt-1 text-sm text-gray-400 transition-colors duration-300 group-hover:text-gray-300">
+                                                        {content}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <p className="text-slate-300 leading-relaxed italic">
+                                    Stay ahead of the market with professional-grade trading signals from Hedgeon Finance!
+                                </p>
                             </div>
-                        </div>
 
-                        <button className="bg-emerald-500/20 px-8 py-4 rounded-xl border border-emerald-400/30 hover:bg-emerald-500/30 transition-all flex items-center gap-3">
-                            <UserPlus className="w-6 h-6 text-emerald-400" />
-                            Become a Merchant
-                        </button>
+                            <Image
+                                src="/images/copy-trading.jpg"
+                                alt="Copy trading"
+                                width={500}
+                                height={350}
+                                className="rounded-xl shadow-xl object-contain"
+                            />
+                        </div>
                     </div>
 
-                    {/* Other Sections Similar Pattern */}
+                    <div className="bg-gradient-to-br from-slate-900 to-emerald-900/20  p-5 md:p-12 rounded-3xl border border-emerald-800/30">
+                        <div className="flex items-center gap-6 mb-10">
+                            <Briefcase className="w-12 h-12 text-emerald-400" />
+                            <h2 className="text-2xl md:text-4xl font-bold text-emerald-200">Consulting Services</h2>
+                        </div>
+
+                        <div className="flex md:flex-row flex-col justify-between gap-12">
+                            <div className="space-y-3 lg:w-1/2">
+                                <p className="text-slate-300 leading-relaxed">
+                                    Our management consulting services focus on our clients’ most critical issues and opportunities:
+                                    strategy, marketing, organization, operations, technology, transformation, digital, advanced
+                                    analytics, corporate finance, mergers & acquisitions and sustainability across all industries and
+                                    geographies
+                                </p>
+                                <p className='text-slate-300 leading-relaxed'>
+                                    We bring deep, functional expertise, but are known for our holistic perspective: we capture value
+                                    across boundaries and between the silos of any organization. We have proven a multiplier effect
+                                    from optimizing the sum of the parts, not just the individual pieces
+                                </p>
+                            </div>
+                            <div className="lg:w-1/2">
+                                <ul className="space-y-3">
+                                    {[
+                                        'Travel and Aviation Consulting',
+                                        'Business Services Consulting',
+                                        'Consumer Products Consulting',
+                                        'Financial Services Consulting',
+                                        'Energy Consulting',
+                                        'Transport & Logistics Consulting',
+                                    ].map((item, index) => (
+                                        <li
+                                            key={index}
+                                            className="group relative transition-all duration-300 hover:-translate-y-0.5"
+                                        >
+
+                                            {/* Main content */}
+                                            <div className={`relative flex space-x-3 items-start p-3 rounded-lg backdrop-blur-sm border transition-all duration-300 bg-gray-800/50 border-gray-700 group-hover:border-emerald-500/30 `}>
+                                                {/* Text content */}
+                                                <p className={`text-gray-300 text-sm leading-relaxed transition-colors duration-300 group-hover:text-white`}>
+                                                    {item}
+                                                    {index !== 0 && item !== 'Consulting' && (
+                                                        <span className="ml-2 text-emerald-400 opacity-0 transition-all duration-300 group-hover:opacity-100">
+                                                            →
+                                                        </span>
+                                                    )}
+                                                    {item === 'Consulting' && (
+                                                        <span className="ml-2 text-purple-400 text-xs bg-purple-900/30 px-2 py-1 rounded-full">
+                                                            Available
+                                                        </span>
+                                                    )}
+                                                </p>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
 
                     {/* Real Estate Section */}
-                    <div className="bg-slate-900/40 p-12 rounded-3xl border border-amber-800/30 relative overflow-hidden">
+                    <div className="bg-slate-900/40  p-5 md:p-12 rounded-3xl border border-amber-800/30 relative overflow-hidden">
                         <div className="absolute inset-0 bg-[url('/real-estate-pattern.svg')] opacity-10"></div>
                         <div className="relative z-10">
                             <div className="flex items-center gap-6 mb-10">
                                 <Building2 className="w-12 h-12 text-amber-400" />
-                                <h2 className="text-4xl font-bold text-amber-200">Real Estate Investment</h2>
+                                <h2 className="text-2xl md:text-4xl font-bold text-amber-200">Real Estate Investment</h2>
                             </div>
 
                             <div className="grid lg:grid-cols-2 gap-8 mb-12">
                                 <div className="space-y-6">
                                     <p className="text-slate-300 leading-relaxed">
-                                        At Hedgeon Finance, we offer strategic real estate investment services that allow you to diversify your portfolio with high-value property investments. Our expert-led approach ensures consistent returns, capital growth, and risk minimization.
+                                        At Hedgeon Finance, we offer strategic real estate investment services, allowing clients to
+                                        diversify their portfolios with high-value property investments while ensuring consistent returns
+                                        and capital growth. Whether you’re an individual investor or a business looking for profitable real
+                                        estate opportunities, our expert-led investment approach minimizes risk and maximizes longterm value.
                                     </p>
-                                    <h3 className="text-2xl text-gray-300 mb-2 font-medium">How Our Real Estate Investment Works</h3>
-                                    <ul className="list-disc pl-6 text-gray-400 space-y-2 mb-4">
-                                        <li>
-                                            Investors can own a share in income-generating properties such as commercial buildings, residential apartments, short-term rental properties (Airbnb-style investments), or land banking for future appreciation.
-                                        </li>
-                                    </ul>
                                     <div className="bg-slate-800/30 p-6 rounded-xl">
-                                        <h4 className="text-lg font-semibold text-amber-300 mb-4">Investment Benefits</h4>
+                                        <h4 className="text-lg font-semibold text-amber-300">How Our Real Estate Investment Works</h4>
+                                        <p className="text-slate-300 mb-4">
+                                            Investors can own a share in income-generating properties, such as:
+                                        </p>
+                                        <ul className="space-y-4">
+                                            {['Commercial buildings', 'Residential apartments', 'Short-term rental properties (Airbnb-style investments)', 'Land banking for future appreciation'].map((benefit) => (
+                                                <li key={benefit} className="flex items-center gap-3 text-slate-300">
+                                                    <Check className="w-5 h-5 text-amber-400" />
+                                                    {benefit}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    <div className="bg-slate-800/30 p-6 rounded-xl">
+                                        <h4 className="text-lg font-semibold text-amber-300 mb-4">How it benefits you</h4>
                                         <ul className="space-y-4">
                                             {realEstateBenefits.map((benefit) => (
                                                 <li key={benefit} className="flex items-center gap-3 text-slate-300">
@@ -238,32 +388,24 @@ function page() {
                                             ))}
                                         </ul>
                                     </div>
+
+
+                                    <div className="md:flex-row flex flex-col items-center gap-5">
+                                        <p className='text-slate-300'>Want to buy a Real estate?</p>
+                                        <Link href="/contact-us" className='bg-amber-600 hover:bg-amber-400 duration-300 text-slate-300 px-10 py-3 rounded-md'>Get In Touch</Link>
+                                    </div>
                                 </div>
 
-                                {/* Add property image gallery component here */}
+                                <div className="hidden lg:flex items-center justify-center">
+                                    <Image
+                                        src="/images/real-estate.jpg"
+                                        alt="Modern real estate buildings"
+                                        width={500}
+                                        height={400}
+                                        className="h-full rounded-xl shadow-lg"
+                                    />
+                                </div>
                             </div>
-
-                            <div className="flex flex-wrap gap-4">
-                                <button className="bg-amber-500/20 px-8 py-4 rounded-xl border border-amber-400/30 hover:bg-amber-500/30 transition-all">
-                                    View REIT Opportunities
-                                </button>
-                                <button className="bg-slate-800/40 px-8 py-4 rounded-xl border border-slate-700/50 hover:border-amber-400/30 transition-all">
-                                    Performance History
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Footer CTA */}
-                    <div className="text-center py-16">
-                        <div className="bg-slate-900/40 p-12 rounded-3xl border border-sky-800/30">
-                            <h3 className="text-2xl font-semibold text-slate-100 mb-4">Need Specialized Assistance?</h3>
-                            <p className="text-slate-300 mb-8 max-w-2xl mx-auto">
-                                Our financial experts are ready to help you navigate complex investment landscapes and find optimal solutions.
-                            </p>
-                            <button className="bg-gradient-to-r from-sky-500 to-cyan-600 px-10 py-5 rounded-xl font-semibold text-lg hover:shadow-2xl transition-all">
-                                Contact Our Advisory Team
-                            </button>
                         </div>
                     </div>
                 </div>

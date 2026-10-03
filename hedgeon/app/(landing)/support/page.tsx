@@ -10,7 +10,6 @@ function Support() {
         <div className="min-h-screen bg-gray-50">
             <BreadcrumbsSection
                 title="Support"
-                description="Explore the latest advancements in web technologies and best practices for building scalable applications in 2024."
             />
 
             <LegalLayout
@@ -28,12 +27,12 @@ function Support() {
                             />
                             <SupportLink
                                 title="Email Support"
-                                description="response@example.com"
+                                description="support@hedgeonfinance.com"
                                 icon="📧"
                             />
                             <SupportLink
                                 title="Phone Support"
-                                description="+1 (555) 123-4567"
+                                description="+1 (580) 304-2990"
                                 icon="📞"
                             />
                         </ul>

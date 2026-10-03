@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Merchant Application Rejected</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f6fa;
+            padding: 20px;
+        }
+
+        .container {
+            background: #fff;
+            max-width: 600px;
+            margin: auto;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            color: #E53935;
+        }
+
+        .content {
+            margin-top: 20px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: 13px;
+            color: #999;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2 class="header">Hedgeon Finance Capital</h2>
+        <div class="content">
+            <p>Hi <strong>
+                    <%= userName %>
+                </strong>,</p>
+            <p>
+                <%= message %>
+            </p>
+            <p>If you believe this was a mistake or have any questions, feel free to contact our support team.</p>
+        </div>
+        <div class="footer">
+            &copy; <%= new Date().getFullYear() %> Hedgeon Finance Capital. All rights reserved.
+        </div>
+    </div>
+</body>
+
+</html>

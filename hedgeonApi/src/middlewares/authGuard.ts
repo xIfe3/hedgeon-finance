@@ -4,7 +4,7 @@ import { InternalServerError, UnauthorizedError } from "../utils/errors";
 import { logError } from "../utils/logger";
 
 const authGuard = (req: Request | any, res: Response, next: NextFunction) => {
-    const token = req.headers["authorization"].split(" ")[1];
+    const token = req.headers["authorization"] && req.headers["authorization"].split(" ")[1];
     if (!token) return logError(res, new UnauthorizedError("Not logged in"));
 
     jwt.verify(

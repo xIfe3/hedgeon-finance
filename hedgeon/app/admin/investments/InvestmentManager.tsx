@@ -5,6 +5,7 @@ import { Table, Button, Space, Input, notification, Badge } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { getAllInvestmentsAdminApi } from '@/app/api/adminApi';
 import InvestmentDetails from './InvestmentDetails';
+import formatNumberWithCommas from '@/utils/formatNumbersWithCommas';
 
 const InvestmentManager = () => {
     const [investments, setInvestments] = useState<any[]>([]);
@@ -16,6 +17,7 @@ const InvestmentManager = () => {
     });
     const [selectedInvestment, setSelectedInvestment] =
         useState<any>(null);
+    const [api, contextHolder] = notification.useNotification();
 
     const fetchInvestments = async () => {
         try {
@@ -27,8 +29,10 @@ const InvestmentManager = () => {
                 ...paginationInfo,
                 total: response.data,
             });
+
+            console.log("RESPONSE", response)
         } catch (error: any) {
-            notification.error({
+            api.error({
                 message: 'Error',
                 description: `Failed to fetch investments requests: ${error.message}`,
             });
@@ -54,7 +58,7 @@ const InvestmentManager = () => {
         {
             title: 'User',
             dataIndex: ['user', 'name'], // Access nested user property
-            render: (_, record) => record.user.name,
+            render: (_, record) => record.user?.name,
             sorter: (a, b) => a.user.name.localeCompare(b.user.name),
         },
         {
@@ -66,29 +70,22 @@ const InvestmentManager = () => {
         {
             title: 'Amount',
             dataIndex: 'amount',
+            render: (amount) => `$${formatNumberWithCommas(amount)}`,
             sorter: (a, b) => a.amount - b.amount,
         },
         {
             title: 'Start Date',
             dataIndex: 'startDate',
+            render: (date) => date ? new Date(date).toLocaleDateString() : 'N/A',
             sorter: (a, b) =>
                 new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
         },
         {
             title: 'End Date',
             dataIndex: 'endDate',
+            render: (date) => date ? new Date(date).toLocaleDateString() : 'N/A',
             sorter: (a, b) =>
                 new Date(a.endDate).getTime() - new Date(b.endDate).getTime(),
-        },
-        {
-            title: 'Auto Reinvestment',
-            dataIndex: 'autoReinvest',
-            render: (text) => (text ? 'Yes' : 'No'),
-        },
-        {
-            title: 'Is Reinvestment',
-            dataIndex: 'isReinvestment',
-            render: (text) => (text ? 'Yes' : 'No'),
         },
         {
             title: 'Status',
@@ -110,16 +107,6 @@ const InvestmentManager = () => {
                 }
             },
             sorter: (a, b) => a.status.localeCompare(b.status),
-        },
-        {
-            title: 'ROI Accumulated',
-            dataIndex: 'roiAccumulated',
-            sorter: (a, b) => a.roiAccumulated - b.roiAccumulated,
-        },
-        {
-            title: 'Currency',
-            dataIndex: 'currency',
-            sorter: (a, b) => a.currency.localeCompare(b.currency),
         },
         {
             title: 'Actions',
@@ -172,12 +159,8 @@ const InvestmentManager = () => {
         <div className="bg-white p-6 rounded-lg shadow-sm">
             <div className="flex justify-between mb-4">
                 <h2 className="text-xl font-semibold">Investment Management</h2>
-                <Input.Search
-                    placeholder="Search investment..."
-                    onSearch={handleSearch}
-                    className="w-3/4" // Make it visible
-                />
             </div>
+            {contextHolder}
             <Table
                 columns={columns}
                 dataSource={filteredInvestments}

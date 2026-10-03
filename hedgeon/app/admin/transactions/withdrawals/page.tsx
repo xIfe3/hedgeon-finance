@@ -1,27 +1,15 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Input, notification, Card, Descriptions, Badge, Space, Select } from 'antd';
+import { Table, Button, notification, Card, Descriptions, Badge, Space, Select, Modal } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
     ArrowLeftOutlined,
     SaveOutlined,
     CloseOutlined,
     EditOutlined,
-    CheckCircleOutlined,
-    CloseCircleOutlined,
-    ClockCircleOutlined
 } from '@ant-design/icons';
-import { getAllWithdrawalRequestsAdminApi } from '@/app/api/adminApi';
-
-
-const updateWithdrawal = async (id: string, updatedData: any) => {
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    console.log('Updating withdrawal', id, 'with', updatedData);
-    // In a real application, you would make an API call here
-    return { success: true, message: 'Withdrawal updated successfully' };
-};
+import { getAllWithdrawalRequestsAdminApi, approveWithdrawalRequestAdminApi, rejectWithdrawalRequestAdminApi } from '@/app/api/adminApi';
 
 interface Withdrawal {
     _id: string;
@@ -29,7 +17,7 @@ interface Withdrawal {
     amount: number;
     currency: string;
     walletAddress: string;
-    status: 'PENDING' | 'APPOVED' | 'FAILED' | 'DECLINED';
+    status: 'PENDING' | 'APPROVED' | 'FAILED' | 'DECLINED';
     createdAt: Date;
 }
 
@@ -42,6 +30,7 @@ const WithdrawalDetails: React.FC<{
     const [editMode, setEditMode] = useState(false);
     const [localWithdrawal, setLocalWithdrawal] = useState<Withdrawal>(withdrawal);
     const initialWithdrawal = React.useRef<Withdrawal>(withdrawal);
+    const [api, contextHolder] = notification.useNotification();
 
     useEffect(() => {
         setLocalWithdrawal(withdrawal);
@@ -55,32 +44,59 @@ const WithdrawalDetails: React.FC<{
     const handleSave = async () => {
         try {
             setLoading(true);
-            const updatedData = {
-                status: localWithdrawal.status,
-            };
-            const response = await updateWithdrawal(withdrawal._id, updatedData);
-            if (response.success) {
-                notification.success({
+            const selectedStatus = localWithdrawal.status;
+
+            if (selectedStatus === 'APPROVED') {
+                await approveWithdrawalRequestAdminApi(withdrawal._id);
+                api.success({
                     message: 'Success',
-                    description: response.message,
+                    description: 'Withdrawal request approved successfully.',
                 });
-                setEditMode(false);
-                onUpdate(); // Refresh
+            } else if (selectedStatus === 'DECLINED') {
+                Modal.confirm({
+                    title: 'Decline Withdrawal',
+                    content: 'Please provide a reason for declining the withdrawal:',
+                    icon: <CloseOutlined />,
+                    okText: 'Submit',
+                    cancelText: 'Cancel',
+                    onOk: async () => {
+                        const reason = prompt("Enter reason for decline:");
+                        if (!reason) {
+                            api.warning({
+                                message: 'Cancelled',
+                                description: 'Decline reason is required.',
+                            });
+                            return;
+                        }
+                        await rejectWithdrawalRequestAdminApi(withdrawal._id, reason);
+                        api.success({
+                            message: 'Success',
+                            description: 'Withdrawal request declined successfully.',
+                        });
+                        onUpdate();
+                    },
+                });
+                return;
             } else {
-                notification.error({
-                    message: 'Error',
-                    description: 'Failed to update withdrawal',
+                api.warning({
+                    message: 'Invalid Action',
+                    description: 'You can only Approve or Decline the withdrawal.',
                 });
+                return;
             }
+
+            setEditMode(false);
+            onUpdate(); // Refresh the withdrawal list
         } catch (error: any) {
-            notification.error({
+            api.error({
                 message: 'Error',
-                description: `Failed to update withdrawal: ${error.message}`,
+                description: error?.response?.data?.message || error.message || 'Failed to update withdrawal',
             });
         } finally {
             setLoading(false);
         }
     };
+
 
     const handleCancel = () => {
         setEditMode(false);
@@ -91,7 +107,7 @@ const WithdrawalDetails: React.FC<{
         switch (status) {
             case 'PENDING':
                 return <Badge status="processing" text="Pending" />;
-            case 'APPOVED':
+            case 'APPROVED':
                 return <Badge status="success" text="Approved" />;
             case 'FAILED':
                 return <Badge status="error" text="Failed" />;
@@ -102,13 +118,15 @@ const WithdrawalDetails: React.FC<{
         }
     };
 
-    const statusOptions: Withdrawal['status'][] = ['PENDING', 'APPOVED', 'FAILED', 'DECLINED'];
+    const statusOptions: Withdrawal['status'][] = ['PENDING', 'APPROVED', 'FAILED', 'DECLINED'];
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm">
             <Button onClick={onBack} className="mb-4">
                 <ArrowLeftOutlined /> Back to List
             </Button>
+
+            {contextHolder}
 
             <Card title="Withdrawal Details">
                 <Descriptions bordered>
@@ -175,6 +193,7 @@ const WithdrawalManager = () => {
         current: 1,
     });
     const [selectedWithdrawal, setSelectedWithdrawal] = useState<Withdrawal | null>(null);
+    const [api, contextHolder] = notification.useNotification();
 
     const fetchWithdrawals = async () => {
         try {
@@ -186,7 +205,7 @@ const WithdrawalManager = () => {
                 total: response.data.length, // Use length of fetched data
             });
         } catch (error: any) {
-            notification.error({
+            api.error({
                 message: 'Error',
                 description: `Failed to fetch withdrawals: ${error.message}`,
             });
@@ -198,10 +217,6 @@ const WithdrawalManager = () => {
     useEffect(() => {
         fetchWithdrawals();
     }, []);
-
-    const handleSearch = (value: string) => {
-        setSearchText(value);
-    };
 
     const handleTableChange = (newPagination: any) => {
         setPaginationInfo(newPagination);
@@ -248,7 +263,7 @@ const WithdrawalManager = () => {
                 switch (status) {
                     case 'PENDING':
                         return <Badge status="processing" text="Pending" />;
-                    case 'APPOVED':
+                    case 'APPROVED':
                         return <Badge status="success" text="Approved" />;
                     case 'FAILED':
                         return <Badge status="error" text="Failed" />;
@@ -307,6 +322,7 @@ const WithdrawalManager = () => {
             <div className="flex justify-between mb-4">
                 <h2 className="text-xl font-semibold">Withdrawal Management</h2>
             </div>
+            {contextHolder}
             <Table
                 columns={columns}
                 dataSource={filteredWithdrawals}

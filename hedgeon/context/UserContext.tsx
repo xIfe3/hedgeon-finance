@@ -10,17 +10,39 @@ type User = {
     phone: string
     password: string
     role: 'user' | 'admin'
+    isMerchant: boolean;
+    kycVerified: boolean;
+    isPendingMerchantVerification: boolean;
+    isPendingKYCVerified: boolean;
     kyc: string
     twoFactorSecret: string
-    currentPlan?: {
+    currentPlan?: [{
         planId: string
+        investmentId: string
         name: string
         startDate: Date
         endDate: Date
         daysGone: number
         investedAmount: number
         roiAccumulated: number
-    }[]
+        status: string
+    }]
+    pastPlans: [{
+        planId: string;
+        investmentId: string;
+        name: string;
+        startDate: Date;
+        endDate: Date;
+        investedAmount: number;
+        roiAccumulated: number;
+        status: string
+    }]
+    notifications: [{
+        message: string,
+        type: string,
+        date: Date,
+        read: boolean
+    }],
     walletBalance: number
     totalInvested: number
     netReturns: number
@@ -69,8 +91,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         try {
             const res = await getProfileApi();
             if (!(res.status === 200)) throw new Error('Unauthorized')
-
-            console.log(res.data['user'])
             setUser(res.data['user'])
         } catch (err) {
             console.log(err)

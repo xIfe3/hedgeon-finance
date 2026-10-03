@@ -16,6 +16,8 @@ export interface IInvestment {
     status: "active" | "completed" | "pending" | "cancelled";
     profitAccumulated: number;
     currency: string
+    transactionId: string
+    receiptUrl: string
 }
 
 const investmentSchema = new mongoose.Schema<IInvestment>({
@@ -40,6 +42,8 @@ const investmentSchema = new mongoose.Schema<IInvestment>({
         type: String,
         enum: Object.values(Currency),
     },
+    transactionId: String,
+    receiptUrl: String,
     isReinvestment: { type: Boolean, default: false },
     status: { type: String, enum: ["active", "completed", "pending", "cancelled"], default: "pending" },
 });

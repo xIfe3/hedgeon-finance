@@ -101,8 +101,8 @@ export const createPlanAdminApi = (planData: any) => { // Adjust 'any' to your P
     return axiosInstance.post("/admin/plans", planData);
 };
 
-export const updatePlanAdminApi = (planId: string, planData: any) => { // Adjust 'any' to your Plan update DTO
-    return axiosInstance.patch(`/admin/plans/${planId}`, planData);
+export const updatePlanAdminApi = (planId: string, planData: any) => {
+    return axiosInstance.put(`/admin/plans/${planId}`, planData);
 };
 
 export const activatePlanAdminApi = (planId: string) => {
@@ -135,8 +135,18 @@ export const getUserByIdAdminApi = (userId: string) => {
     return axiosInstance.get(`/admin/users/${userId}`);
 };
 
-export const updateUserAdminApi = (userId: string, userData: any) => { // Adjust 'any' to your User update DTO
+export const updateUserAdminApi = (userId: string, userData: any) => {
     return axiosInstance.put(`/admin/users/${userId}`, userData);
+};
+
+export const updateUserWalletAdminApi = (
+    userId: string,
+    data: {
+        action: 'ADD' | 'SUBTRACT' | 'SET';
+        amount: number;
+    }
+) => {
+    return axiosInstance.put(`/admin/users/${userId}/wallet`, data);
 };
 
 export const deleteUserAdminApi = (userId: string) => {
@@ -181,4 +191,34 @@ export const approveWithdrawalRequestAdminApi = (withdrawalId: string) => {
 
 export const rejectWithdrawalRequestAdminApi = (withdrawalId: string, reason: string) => {
     return axiosInstance.patch(`/admin/withdrawals/${withdrawalId}/reject`, { reason });
+};
+
+
+// -------------------- Mercahant API Calls --------------------
+export const getAllMerchantRequestsAdminApi = () => {
+    return axiosInstance.get("/admin/merchant/applications");
+};
+
+export const getMerchantRequestByIdAdminApi = (applicationId: string) => {
+    return axiosInstance.get(`/admin/merchant/applications/${applicationId}`);
+};
+
+export const approveMerchantRequestAdminApi = (applicationId: string) => {
+    return axiosInstance.patch(`/admin/merchant/applications/${applicationId}/approve`);
+};
+
+export const rejectMerchantRequestAdminApi = (applicationId: string, reason: string) => {
+    return axiosInstance.patch(`/admin/merchant/applications/${applicationId}/reject`, { reason });
+};
+
+export const deleteMerchantApplicationAdminApi = (applicationId: string) => {
+    return axiosInstance.delete(`/admin/merchant/applications/${applicationId}/delete`);
+};
+
+export const getAllMerchantAdminApi = () => {
+    return axiosInstance.get("/admin/merchants");
+};
+
+export const getMerchantByIdAdminApi = (merchantId: string) => {
+    return axiosInstance.get(`/admin/merchants/${merchantId}`);
 };

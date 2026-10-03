@@ -36,7 +36,7 @@ const PlanDetailsPage = () => {
     }, [planId]);
 
     if (loading) {
-        return <div className="min-h-screen flex items-center justify-center">Loading plan details...</div>;
+        return <div className="loader"></div>
     }
 
     if (error || !plan) {
@@ -64,7 +64,7 @@ const PlanDetailsPage = () => {
                     <div className="py-4 border-t border-b border-gray-200 mb-6">
                         <div className="flex items-center justify-between mb-2">
                             <span className="text-sm font-semibold text-gray-600"><FiClock className="inline mr-1" /> Duration:</span>
-                            <span className="text-lg text-gray-800">{plan.durationMonths} months</span>
+                            <span className="text-lg text-gray-800">{plan.duration} {plan.durationType === 'weeks' ? 'weeks' : 'months'}</span>
                         </div>
                         <div className="flex items-center justify-between mb-2">
                             <span className="text-sm font-semibold text-green-600"><FiTrendingUp className="inline mr-1" /> Est. ROI:</span>
@@ -90,7 +90,7 @@ const PlanDetailsPage = () => {
                     </div>
                 </div>
                 <div className="bg-gray-50 p-6 border-t border-gray-200 flex justify-end">
-                    <Link href={`explore/invest/${plan._id}`} className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1">
+                    <Link href={`/personal/explore/invest/${plan._id}`} className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1">
                         Invest Now
                     </Link>
                 </div>

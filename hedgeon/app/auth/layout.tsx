@@ -11,9 +11,7 @@ export const metadata: Metadata = {
 function AuthLayout({ children }: { children: React.ReactNode }) {
     return (
         <section>
-            <Header />
             {children}
-            <Footer />
         </section>
     )
 }

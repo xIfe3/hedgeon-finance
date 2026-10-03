@@ -1,5 +1,5 @@
 {
     "watch": ["./src"],
     "ext": "ts",
-    "exec": "tsc && node build/index.js"
+    "exec": "tsc && copyfiles -u 1 src/views/**/* build/ && node build/index.js"
 }

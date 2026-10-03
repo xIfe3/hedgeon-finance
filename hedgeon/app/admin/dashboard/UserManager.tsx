@@ -5,7 +5,6 @@ import { Table, Button, Space, Input, notification, Badge, Card, Descriptions, T
 import type { ColumnsType } from 'antd/es/table';
 import {
     CheckCircle,
-    PauseCircle,
     BanIcon,
     Check,
     X,
@@ -38,6 +37,7 @@ const UserDetails: React.FC<{ user: UserType; onBack: () => void; onUpdate: () =
     const [editMode, setEditMode] = useState(false);
     const [localUser, setLocalUser] = useState<UserType>(user);  // State for editable fields
     const initialUser = React.useRef<UserType>(user);
+    const [api, contextHolder] = notification.useNotification();
 
     useEffect(() => {
         setLocalUser(user);
@@ -66,7 +66,7 @@ const UserDetails: React.FC<{ user: UserType; onBack: () => void; onUpdate: () =
                 throw new Error(response.data?.message || `Failed to ${statusField} user`);
             }
 
-            notification.success({
+            api.success({
                 message: 'Success',
                 description: `User ${statusField} status updated to ${newValue ? 'Yes' : 'No'}`,
             });
@@ -75,7 +75,7 @@ const UserDetails: React.FC<{ user: UserType; onBack: () => void; onUpdate: () =
             onUpdate(); // Refresh user list
 
         } catch (error: any) {
-            notification.error({
+            api.error({
                 message: 'Error',
                 description: error.message || `Failed to ${statusField} user`,
             });
@@ -92,7 +92,7 @@ const UserDetails: React.FC<{ user: UserType; onBack: () => void; onUpdate: () =
             setLocalUser({ ...localUser, isVerified: !localUser.isVerified });
             onUpdate();
         } catch (error: any) {
-            notification.error({
+            api.error({
                 message: 'Error',
                 description: 'Failed to update user verification status',
             });
@@ -111,14 +111,14 @@ const UserDetails: React.FC<{ user: UserType; onBack: () => void; onUpdate: () =
             //  API to update user details.
             await updateUserAdminApi(user._id, localUser);
 
-            notification.success({
+            api.success({
                 message: 'Success',
                 description: 'User details updated',
             });
             setEditMode(false);
             onUpdate();
         } catch (error: any) {
-            notification.error({
+            api.error({
                 message: 'Error',
                 description: error.message || 'Failed to update user details',
             });
@@ -140,6 +140,8 @@ const UserDetails: React.FC<{ user: UserType; onBack: () => void; onUpdate: () =
                 <Button onClick={onBack} className="mb-4">
                     &larr; Back to List
                 </Button>
+
+                {contextHolder}
 
                 <Card title={`User Details: ${localUser.name}`}>
                     <Tabs defaultActiveKey="general">
@@ -268,6 +270,7 @@ const UserManager = ({ users, setUsers }: any) => {
     const [activeFilter, setActiveFilter] = useState<boolean | null>(null); // null: all, true: active, false: inactive
     const [verifiedFilter, setVerifiedFilter] = useState<boolean | null>(null); // null: all, true: verified, false: not verified
     const [suspendedFilter, setSuspendedFilter] = useState<boolean | null>(null);
+    const [api, contextHolder] = notification.useNotification();
 
     const fetchUsers = useCallback(async () => {
         try {
@@ -307,12 +310,12 @@ const UserManager = ({ users, setUsers }: any) => {
 
         } catch (error: any) {
             if (error instanceof AxiosError) {
-                notification.error({
+                api.error({
                     message: 'Error',
                     description: error.response?.data?.message || 'Failed to fetch users',
                 });
             } else {
-                notification.error({
+                api.error({
                     message: 'Error',
                     description: error.message || 'Failed to fetch users',
                 });

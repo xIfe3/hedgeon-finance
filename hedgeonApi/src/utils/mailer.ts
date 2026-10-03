@@ -1,159 +1,48 @@
-import "dotenv/config";
 import nodemailer from "nodemailer";
-import {
-    generateDepositRequestEmail,
-    generateWithdrawalRequestEmail,
-    generateAdminDepositNotification,
-    generateAdminWithdrawalNotification,
-    generateDepositStatusEmail,
-    generateWithdrawalStatusEmail,
-    generateLoginEmail,
-    generateRegistrationEmail,
-    generatePasswordChangeNotification,
-    generatePasswordResetEmail,
-    generateAdminProfileUpdateNotification,
-} from "./emailTemplates";
+import ejs from "ejs";
+import path from "path";
 
-const ADMIN_EMAIL = "Admin <admin@hedgeon.io>"; // Replace with actual admin email
+const ADMIN_EMAIL = "support@hedgeonfinance.com";
+const EMAIL_USER = "support@hedgeonfinance.com";
+const EMAIL_PASSWORD = "Pass@hedgeon123";
 
-class EmailService {
-    transporter: nodemailer.Transporter;
-
-    constructor() {
-        // Set up nodemailer transporter with Postmark SMTP settings
-        this.transporter = nodemailer.createTransport({
-            host: "smtp.hostinger.com",
-            port: 465,
-            secure: true,
-            auth: {
-                user: "admin@algotrades.io",
-                pass: "Password7@algotrades.io",
-            },
-        });
+// Configure your mailer
+const transporter = nodemailer.createTransport({
+    host: 'mail.spacemail.com',
+    secure: true,
+    port: 465,
+    auth: {
+        user: EMAIL_USER,
+        pass: EMAIL_PASSWORD
     }
+});
 
-    async sendMail(to: string, subject: string, html: string) {
-        try {
-            console.log(`Sending email to: ${to} with subject: ${subject}`);
-            const response = await this.transporter.sendMail({
-                from: ADMIN_EMAIL,
-                to: to,
-                subject: subject,
-                html: html,
-                text: html.replace(/<[^>]*>/g, ""), // Optional: generate plain text from HTML
-                headers: {
-                    "X-PM-Message-Stream": "outbound", // Specify message stream
-                },
-            });
-            console.log("Email sent successfully:", response);
-        } catch (error) {
-            console.error(`Error sending mail: ${JSON.stringify(error)}`);
-        }
-    }
+/**
+ * Sends an email using an EJS template.
+ *
+ * @param {string} to - The recipient's email address.
+ * @param {string} subject - The subject of the email.
+ * @param {string} templateName - The name of the EJS template file (without the .ejs extension).
+ * @param {object} templateData - The data to pass to the EJS template.
+ */
+const sendEmail = async (to: string, subject: string, templateName: string, templateData: any) => {
+    try {
+        const templatePath = path.join(__dirname, '../views/emails', `${templateName}.ejs`);
+        const emailHtml: string = await ejs.renderFile(templatePath, templateData);
 
-    // User login notification
-    async sendLoginNotification(user: any) {
-        const template = generateLoginEmail(user.fullName);
-        await this.sendMail(user.email, "New Login Notification", template);
-    }
-    // User profile update notification
-    async sendProfileUpdatedNotification(user: any) {
-        const template = generateAdminProfileUpdateNotification(user.fullName);
-        await this.sendMail(
-            user.email,
-            "Profile Updated Notification",
-            template
-        );
-    }
+        const mailOptions = {
+            from: `"Jake from Hedgeon Finance" <${ADMIN_EMAIL}>`,
+            to: to,
+            subject: subject,
+            html: emailHtml,
+        };
 
-    // User registration confirmation
-    async sendRegistrationConfirmation(user: any, token: number) {
-        const template = generateRegistrationEmail(user.fullName, token);
-        await this.sendMail(
-            user.email,
-            "Welcome to Algotrades - Please Verify Your Email",
-            template
-        );
+        await transporter.sendMail(mailOptions);
+        console.log(`Email sent successfully to ${to}`);
+    } catch (error: any) {
+        console.error(`Error sending email to ${to}:`, error);
+        throw new Error(`Failed to send email: ${error.message}`);
     }
+};
 
-    // User deposit status update
-    async sendDepositStatusUpdate(user: any, amount: number, status: string) {
-        const template = generateDepositStatusEmail(
-            user.fullName,
-            amount,
-            status
-        );
-        await this.sendMail(user.email, "Deposit Status Update", template);
-    }
-
-    // User deposit request
-    async sendDepositRequest(user: any, amount: number) {
-        const template = generateDepositRequestEmail(user.fullName, amount);
-        await this.sendMail(user.email, "Deposit Request Received", template);
-    }
-
-    // Notify admin about deposit request
-    async notifyAdminAboutDeposit(user: any, amount: number) {
-        const template = generateAdminDepositNotification(
-            user.fullName,
-            amount
-        );
-        await this.sendMail(ADMIN_EMAIL, "New Deposit Request", template);
-    }
-
-    async notifyAdminAboutProfileUpdate(user: any) {
-        const template = generateAdminProfileUpdateNotification(user.fullName);
-        await this.sendMail(ADMIN_EMAIL, "User Profile Updated", template);
-    }
-
-    // Withdrawal status update
-    async sendWithdrawalStatusUpdate(
-        user: any,
-        amount: number,
-        status: string
-    ) {
-        const template = generateWithdrawalStatusEmail(
-            user.fullName,
-            amount,
-            status
-        );
-        await this.sendMail(user.email, "Withdrawal Status Update", template);
-    }
-
-    // Withdrawal request
-    async sendWithdrawalRequest(user: any, amount: number) {
-        const template = generateWithdrawalRequestEmail(user.fullName, amount);
-        await this.sendMail(
-            user.email,
-            "Withdrawal Request Received",
-            template
-        );
-    }
-
-    // Notify admin about withdrawal request
-    async notifyAdminAboutWithdrawal(user: any, amount: number) {
-        const template = generateAdminWithdrawalNotification(
-            user.fullName,
-            amount
-        );
-        await this.sendMail(ADMIN_EMAIL, "New Withdrawal Request", template);
-    }
-
-    // Password change notification
-    async sendPasswordChangeNotification(user: any) {
-        const template = generatePasswordChangeNotification(user.fullName);
-        await this.sendMail(
-            user.email,
-            "Password Change Notification",
-            template
-        );
-    }
-
-    // Password reset request
-    async sendPasswordResetRequest(user: any, resetLink: string) {
-        const template = generatePasswordResetEmail(user.fullName, resetLink);
-        await this.sendMail(user.email, "Password Reset Request", template);
-    }
-}
-
-export default EmailService;
+export default sendEmail;

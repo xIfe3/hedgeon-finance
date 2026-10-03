@@ -8,7 +8,6 @@ function AdminInvestmentPage() {
         <Section>
             <h1 className="text-3xl font-bold">Investment Management</h1>
 
-            <InvestmentStats />
             <InvestmentManager />
         </Section>
     )

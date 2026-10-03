@@ -7,15 +7,13 @@ function ContactUsPage() {
         <div className="min-h-screen bg-gray-50">
             <BreadcrumbsSection
                 title="Contact Us"
-                description="Explore the latest advancements in web technologies and best practices for building scalable applications in 2024."
             />
 
             <section className="min-h-screen bg-gradient-to-br from-slate-950 via-sky-950 to-indigo-950">
                 {/* Interactive Map Section */}
                 <div className="relative h-[500px] group overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent z-10"></div>
-                    <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d317715.7119163245!2d-0.3817825056791108!3d51.52873519656658!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47d8a00baf21de75%3A0x52963a5addd52a99!2sLondon%2C%20UK!5e0!3m2!1sen!2sus!4v1718810922923!5m2!1sen!2sus"
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d96671.06751999454!2d-74.1108090142642!3d40.7846547752833!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1s415%20Liberty%20Street!5e0!3m2!1sen!2sng!4v1748858076133!5m2!1sen!2sng"
                         className="w-full h-full object-cover transform transition-all group-hover:scale-105"
                         style={{ border: 0 }}
                         allowFullScreen
@@ -30,15 +28,15 @@ function ContactUsPage() {
                             <div className="space-y-3 text-slate-300">
                                 <div className="flex items-center gap-3">
                                     <MapPin className="w-5 h-5 text-sky-400" />
-                                    <p>123 Financial District, London, UK</p>
+                                    <p>415 Liberty Street, Suite 800, New York, NY 10006, United States</p>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <Phone className="w-5 h-5 text-sky-400" />
-                                    <p>+44 20 7946 0815</p>
+                                    <p>+1 (580) 304-2990</p>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <Mail className="w-5 h-5 text-sky-400" />
-                                    <p>contact@fundacionfinance.com</p>
+                                    <p>support@hedgeonfinance.com</p>
                                 </div>
                             </div>
                         </div>
@@ -82,8 +80,8 @@ function ContactUsPage() {
                                     <h4 className="text-xl font-semibold text-purple-200 mb-2">24/7 Support</h4>
                                     <p className="text-slate-300">
                                         Emergency line:<br />
-                                        +44 20 7946 0816<br />
-                                        support@fundacionfinance.com
+                                        +1 (580) 304-2990<br />
+                                        support@hedgeonfinance.com
                                     </p>
                                 </div>
                             </div>
@@ -166,7 +164,7 @@ function ContactUsPage() {
                             <div className="text-slate-300 text-lg">
                                 or call directly:
                                 <span className="text-sky-300 ml-2 hover:text-sky-200 transition-colors">
-                                    +44 20 7946 0815
+                                    +1 (580) 304-2990
                                 </span>
                             </div>
                         </div>

@@ -18,6 +18,9 @@ import {
     getPayoutTrackerByInvestmentView,
     getAllPlansView,
     getPlanByIdView,
+    createPlanView,
+    updatePlanView,
+    deletePlanView,
     getAllTransactionsView,
     getTransactionByIdView,
     getAllUsersView,
@@ -26,8 +29,18 @@ import {
     updateUserStatus,
     verifyUserEmail,
     updateUser,
+    deleteUserView,
     getAllWithdrawalRequestsView,
     getWithdrawalRequestByIdView,
+    updateWithdrawalStatusView,
+    getAllMerchantApplications,
+    getMerchantApplication,
+    approveMerchantApplication,
+    rejectMerchantApplication,
+    deleteMerchantApplication,
+    getAllMerchants,
+    getMerchantById,
+    updateUserWallet
 } from '../controllers/admin.controller';
 
 const router = express.Router();
@@ -58,6 +71,9 @@ router.get('/payout-trackers/investment/:investmentId', isAdmin, getPayoutTracke
 // Plan Routes
 router.get('/plans', isAdmin, getAllPlansView);
 router.get('/plans/:planId', isAdmin, getPlanByIdView);
+router.post("/plans", isAdmin, createPlanView);
+router.put("/plans/:planId", isAdmin, updatePlanView);
+router.delete("/plans/:planId", isAdmin, deletePlanView);
 
 // Transaction Routes
 router.get('/transactions', isAdmin, getAllTransactionsView);
@@ -70,9 +86,22 @@ router.get('/users/:userId/referrals', isAdmin, viewUserReferralsView);
 router.put('/users/:userId/status', isAdmin, updateUserStatus);
 router.put('/users/:userId/verify-email', isAdmin, verifyUserEmail);
 router.put('/users/:userId/', isAdmin, updateUser);
+router.put('/users/:userId/', isAdmin, deleteUserView);
+router.put('/users/:userId/wallet', isAdmin, updateUserWallet);
 
 // Withdrawal Routes
 router.get('/withdrawals', isAdmin, getAllWithdrawalRequestsView);
 router.get('/withdrawals/:withdrawalId', isAdmin, getWithdrawalRequestByIdView);
+router.get('/withdrawals/:withdrawalId', isAdmin, updateWithdrawalStatusView);
+
+// Merchant Application Routes
+router.get('/merchant/applications', isAdmin, getAllMerchantApplications);
+router.get('/merchant/applications/:id', isAdmin, getMerchantApplication);
+router.patch('/merchant/applications/:id/approve', isAdmin, approveMerchantApplication);
+router.patch('/merchant/applications/:id/reject', isAdmin, rejectMerchantApplication);
+router.delete('/merchant/applications/:id/delete', isAdmin, deleteMerchantApplication);
+
+router.get('/admin/merchants', isAdmin, getAllMerchants);
+router.get('/admin/merchants/:id', isAdmin, getMerchantById);
 
 export default router;

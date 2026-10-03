@@ -6,8 +6,9 @@ const investmentPlans = [
         name: "Trial Package",
         minAmount: 5000,
         maxAmount: 15000,
-        durationMonths: 3, // Using min duration
-        durationType: "months",
+        minDuration: 3, // minimum duration
+        maxDuration: 6, // maximum duration
+        durationType: "weeks",
         estimatedROI: 5, // weekly
         taxOnProfit: 0,
         referralBonus: 3,
@@ -26,7 +27,8 @@ const investmentPlans = [
         name: "Basic Package",
         minAmount: 30000,
         maxAmount: 70000,
-        durationMonths: 6, // Using min duration
+        minDuration: 6, // minimum duration
+        maxDuration: 12, // maximum duration
         durationType: "months",
         estimatedROI: 7,
         taxOnProfit: 10,
@@ -45,7 +47,8 @@ const investmentPlans = [
         name: "Standard Package",
         minAmount: 100000,
         maxAmount: 500000,
-        durationMonths: 12, // Using min duration
+        minDuration: 12, // minimum duration
+        maxDuration: 24, // maximum duration
         durationType: "months",
         estimatedROI: 11,
         taxOnProfit: 15,
@@ -65,7 +68,8 @@ const investmentPlans = [
         name: "Premium Package",
         minAmount: 500000,
         maxAmount: 1500000,
-        durationMonths: 24, // Using min duration
+        minDuration: 24, // minimum duration
+        maxDuration: 36, // maximum duration
         durationType: "months",
         estimatedROI: 15,
         taxOnProfit: 20,
@@ -84,26 +88,27 @@ const investmentPlans = [
     }
 ];
 
+
 const currencies = [
     {
         name: 'USDT (TRC-20)',
-        address: 'Bo47XfDUKcb31Bbq6661NoVZjZuW26s9Af7BK1mhn4ut', // Replace with your actual USDT address
-        qrCodeUrl: 'https://asset.cloudinary.com/dfeoowyra/e1f9fb872dde2ba06aacff9312445857', // Replace with your Cloudinary USDT QR code URL
+        address: 'TKevn6mrvWitruLsruftTATtjnX1bek3u9', // Replace with your actual USDT address
+        qrCodeUrl: 'https://res.cloudinary.com/dfeoowyra/image/upload/fl_preserve_transparency/v1746865902/USDT%20QR%20Code.jpg?_s=public-apps'
     },
     {
         name: 'BTC',
         address: 'bc1q6ujvvxafu4td0wpfm4eujyyrxec45wvu8m95lf',     // Replace with your actual BTC address
-        qrCodeUrl: 'https://asset.cloudinary.com/dfeoowyra/e97a959e93c3f59847edc911fc68472a',     // Replace with your Cloudinary BTC QR code URL
+        qrCodeUrl: 'https://res.cloudinary.com/dfeoowyra/image/upload/fl_preserve_transparency/v1746865995/Bitcoin%20QR%20Code.jpg?_s=public-apps'
     },
     {
         name: 'ETH',
-        address: 'YOUR_ETH_WALLET_ADDRESS',     // Replace with your actual ETH address
-        qrCodeUrl: 'CLOUDINARY_ETH_QR_CODE_URL',     // Replace with your Cloudinary ETH QR code URL
+        address: '0x27F9165b31036D254E449325ef70c6bB4a998eAB',     // Replace with your actual ETH address
+        qrCodeUrl: 'https://res.cloudinary.com/dfeoowyra/image/upload/fl_preserve_transparency/v1746865813/Ethereum%20QR%20Code.jpg?_s=public-apps',
     },
     {
         name: 'SOL',
-        address: '0x27F9165b31036D254E449325ef70c6bB4a998eAB',     // Replace with your actual TRX address
-        qrCodeUrl: 'https://asset.cloudinary.com/dfeoowyra/d526073a9d77dbbaf302ab837ed1b361',     // Replace with your Cloudinary TRX QR code URL
+        address: 'Bo47XfDUKcb31Bbq6661NoVZjZuW26s9Af7BK1mhn4ut',     // Replace with your actual TRX address
+        qrCodeUrl: 'https://res.cloudinary.com/dfeoowyra/image/upload/fl_preserve_transparency/v1746865865/Solana%20QR%20Code.jpg?_s=public-apps'
     },
 ]
 

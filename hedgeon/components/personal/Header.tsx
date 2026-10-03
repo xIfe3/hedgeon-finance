@@ -3,8 +3,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FiBell, FiChevronDown, FiUser, FiSettings, FiLogOut } from 'react-icons/fi';
 import { useUser } from '@/context/UserContext';
-import { logoutApi } from '@/app/api/authApi';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const CurrentDate = () => {
     const currentDate = new Date();
@@ -43,22 +43,23 @@ function DashboardHeader() {
         };
     }, []);
 
-    const handleLogout = async () => {
-        try {
-            const response = await logoutApi();
-            console.log(response);
-            localStorage.removeItem('access_token')
-            router.push('/auth/login');
-        } catch (error) {
-            console.error('Logout failed:', error);
-        }
-    }
+
+
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+
+        if (hour < 12) return "Good morning";
+        if (hour < 17) return "Good afternoon";
+        return "Good evening";
+    };
 
     return (
-        <div className="flex justify-between items-center mb-6 md:mb-8">
+        <div className="flex justify-between items-center mb-6 md:mb-8 sticky top-0 bg-white z-50 p-2">
             {/* Left Section: Greeting and Date */}
             <div>
-                <h1 className="text-xl font-semibold text-gray-800 md:text-2xl">Good morning, {user?.name}</h1>
+                <h1 className="text-xl font-semibold text-gray-800 md:text-2xl">
+                    {getGreeting()}, {user?.name.split(" ")[0]}
+                </h1>
                 <CurrentDate />
             </div>
 
@@ -67,8 +68,6 @@ function DashboardHeader() {
                 {/* Notification Bell */}
                 <button className="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
                     <FiBell className="text-xl text-gray-600" />
-                    {/* Optional: Notification badge */}
-                    {/* <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-600 bg-red-100 rounded-full">3</span> */}
                 </button>
 
                 {/* Profile Section with Dropdown Trigger */}
@@ -94,19 +93,19 @@ function DashboardHeader() {
                                     Signed in as <span className="font-semibold">{user?.name?.split(' ')[0]}</span>
                                 </span>
                                 <hr className="border-gray-200 my-1" />
-                                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left focus:outline-none">
+                                <Link href="/personal/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left focus:outline-none">
                                     <FiUser className="inline-block mr-2 text-gray-500" />
                                     Profile
-                                </button>
-                                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left focus:outline-none">
+                                </Link>
+                                <Link href="/personal/profile/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left focus:outline-none">
                                     <FiSettings className="inline-block mr-2 text-gray-500" />
                                     Settings
-                                </button>
+                                </Link>
                                 <hr className="border-gray-200 my-1" />
-                                <button className="block px-4 py-2 text-sm text-red-500 hover:bg-red-50 hover:text-red-700 w-full text-left focus:outline-none" onClick={handleLogout}>
+                                <Link href="/auth/logout" className="block px-4 py-2 text-sm text-red-500 hover:bg-red-50 hover:text-red-700 w-full text-left focus:outline-none">
                                     <FiLogOut className="inline-block mr-2 text-red-500" />
                                     Logout
-                                </button>
+                                </Link>
                             </div>
                         </div>
                     )}

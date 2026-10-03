@@ -1,14 +1,13 @@
-// utils/axiosInstance.ts
 'use client'
 
-import axios, { AxiosInstance, AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 
 // const baseURL = "http://localhost:3500/api/v1/";
 const baseURL = "https://hedgeon-finance-i9bz.onrender.com/api/v1/";
 
 const axiosInstance: AxiosInstance = axios.create({
     baseURL,
-    timeout: 10000,
+    timeout: 100000,
     headers: {
         "Content-Type": "application/json",
     },
@@ -34,7 +33,12 @@ axiosInstance.interceptors.response.use(
             data: response.data,
             status: response.status,
         };
-    },
+    }, (error) => {
+        console.log("Error in response interceptor!!!", error?.response?.status);
+
+        return Promise.reject(error);
+
+    }
 );
 
 export default axiosInstance;

@@ -1,13 +1,12 @@
-// components/admin/InvestmentStats.tsx
 import React from 'react';
 
 const InvestmentStats = ({ total, active, pending, failed }: any) => {
 
     const stats = [
-        { title: 'Total Investments', value: '1,234', icon: '👤' },
-        { title: 'Active Investments', value: '$452k', icon: '💼' },
-        { title: 'Pending Investments', value: '23', icon: '📑' },
-        { title: 'Failed Investments', value: '$152k', icon: '💰' },
+        { title: 'Total Investments', value: total, icon: '👤' },
+        { title: 'Active Investments', value: active, icon: '💼' },
+        { title: 'Pending Investments', value: pending, icon: '📑' },
+        { title: 'Failed Investments', value: failed, icon: '💰' },
     ];
 
     return (

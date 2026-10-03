@@ -10,6 +10,7 @@ import Section from '@/components/admin/Section';
 interface IKYC {
     _id: string;
     userId: { _id: string; name: string; email: string }; // Adjust based on your User model
+    documentType: string;
     idDocumentUrl: string;
     proofOfAddress: string;
     selfieUrl: string;
@@ -21,29 +22,44 @@ interface IKYC {
 // KYCDetails Component
 const KYCDetails: React.FC<{ kyc: IKYC; onBack: () => void; onUpdate: () => void }> = ({ kyc, onBack, onUpdate }) => {
     const [loading, setLoading] = useState(false);
+    const [api, contextHolder] = notification.useNotification();
 
     // Function to handle verification status update (you'll need to create this API)
     const handleVerify = async (verifiedStatus: boolean) => {
         try {
             setLoading(true);
 
-            const response = await updateKYCVerificationStatus(kyc._id, verifiedStatus); // Adjust the API call as necessary
+            const response = await updateKYCVerificationStatus(kyc._id, verifiedStatus);
             console.log(response.data);
 
-            notification.success({
+            api.success({
                 message: 'Success',
                 description: `KYC verification status updated to ${verifiedStatus ? 'Verified' : 'Unverified'}`,
             });
-            onUpdate(); // Refresh the list
+
+            onUpdate();
         } catch (error: any) {
-            notification.error({
-                message: 'Error',
-                description: error.message || 'Failed to update KYC verification status',
+            let message = 'An unexpected error occurred';
+            if (error?.response) {
+                // Handle known server errors
+                if (error.response.status === 500) {
+                    message = 'Server error (500): Something went wrong on the server. Please try again later.';
+                } else {
+                    message = error.response.data?.message || error.message || message;
+                }
+            } else if (error?.message) {
+                message = error.message;
+            }
+
+            api.error({
+                message: 'Error Verifying KYC',
+                description: message,
             });
         } finally {
             setLoading(false);
         }
     };
+
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm">
@@ -51,23 +67,25 @@ const KYCDetails: React.FC<{ kyc: IKYC; onBack: () => void; onUpdate: () => void
                 &larr; Back to List
             </Button>
 
+            {contextHolder}
+
             <Card title={`KYC Details for ${kyc.userId.name}`}>
                 <Descriptions bordered>
                     <Descriptions.Item label="User Name">{kyc.userId.name}</Descriptions.Item>
                     <Descriptions.Item label="User Email">{kyc.userId.email}</Descriptions.Item>
                     <Descriptions.Item label="ID Document">
                         <a href={kyc.idDocumentUrl} target="_blank" rel="noopener noreferrer">
-                            View Document
+                            View ID Document
                         </a>
                     </Descriptions.Item>
                     <Descriptions.Item label="Proof of Address">
                         <a href={kyc.proofOfAddress} target="_blank" rel="noopener noreferrer">
-                            View Document
+                            View Proof Of Address
                         </a>
                     </Descriptions.Item>
                     <Descriptions.Item label="Selfie">
                         <a href={kyc.selfieUrl} target="_blank" rel="noopener noreferrer">
-                            View Image
+                            View Selfie Image
                         </a>
                     </Descriptions.Item>
                     <Descriptions.Item label="Verification Status" span={3}>
@@ -140,13 +158,6 @@ const KYCManager = () => {
     const handleSearch = (value: string) => {
         setSearchText(value);
     };
-
-    // Function to handle filter change
-    const handleFilterChange = (value: boolean | null) => {
-        setVerificationStatus(value);
-        setPaginationInfo({ ...paginationInfo, current: 1 }); // Reset to first page when filter changes
-    };
-
     const columns: ColumnsType<IKYC> = [
         {
             title: 'User',
@@ -154,19 +165,9 @@ const KYCManager = () => {
             render: (_, record) => record.userId.name,
         },
         {
-            title: 'ID Document',
-            dataIndex: 'idDocumentUrl',
-            render: (_, record) => record.idDocumentUrl,
-        },
-        {
-            title: 'Proof of Address',
-            dataIndex: 'proofOfAddress',
-            render: (_, record) => record.proofOfAddress,
-        },
-        {
-            title: 'Selfie URL',
-            dataIndex: 'selfieUrl',
-            render: (_, record) => record.selfieUrl,
+            title: 'Document Type',
+            dataIndex: 'documentType',
+            render: (_, record) => record.documentType,
         },
         {
             title: 'Verified',

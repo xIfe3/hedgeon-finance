@@ -11,16 +11,15 @@ import userModel from "../models/user.model";
 import { logData, logError } from "../utils/logger";
 import {
     generateAccessToken,
-    generatePasswordResetLink,
     generateRefreshToken,
     generateToken,
     verifyToken,
     generateReferralLink,
     generateVerificationToken,
 } from "../utils/jwtUtils";
-import { emailService } from "..";
 import jwt from "jsonwebtoken";
 import { Request, Response } from "../utils/Types";
+import sendEmail from "../utils/mailer";
 
 const ADMIN_PASSKEY = process.env.ADMIN_PASSKEY || "fallbackkey";
 
@@ -110,9 +109,19 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     // Save the token in the user's record
     const verificationtoken = generateVerificationToken();
     user.emailVerificationToken = verificationtoken;
-    await user.save();
 
-    // await emailService.sendRegistrationConfirmation(user, verificationtoken);
+    // Send welcome + verification email
+    try {
+        const emailSubject = `Welcome to Hedgeon Finance Capital - Verify Your Email`;
+        const templateData = {
+            userName: user.name || 'User',
+            verificationCode: verificationtoken
+        };
+        await sendEmail(user.email, emailSubject, 'welcomeAndVerify', templateData); // Use your combined template name here
+    } catch (emailError) {
+        console.error(`Failed to send welcome email to ${user.email}:`, emailError);
+        return logError(res, new InternalServerError(`Failed to send welcome email to ${user.email}`));
+    }
 
     // Generate tokens
     const accessToken = generateAccessToken({
@@ -178,7 +187,17 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
         return logError(res, new NotFoundError("Account not found"));
     }
 
-    // await emailService.sendLoginNotification(foundUser);
+    // Send welcome + verification email
+    try {
+        const emailSubject = `Welcome to Hedgeon Finance Capital - Verify Your Email`;
+        const templateData = {
+            userName: foundUser.name
+        };
+        await sendEmail(foundUser.email, emailSubject, 'login', templateData); // Use your combined template name here
+    } catch (emailError) {
+        console.error(`Failed to send login email to ${foundUser.email}:`, emailError);
+        return logError(res, new InternalServerError(`Failed to send login email to ${foundUser.email}`));
+    }
 
     const accessToken = generateAccessToken({
         id: foundUser._id,
@@ -203,10 +222,17 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
         foundUser.emailVerificationToken = verificationtoken;
         await foundUser.save();
 
-        // await emailService.sendRegistrationConfirmation(
-        //     foundUser,
-        //     verificationtoken
-        // );
+        try {
+            const emailSubject = `Welcome to Hedgeon Finance Capital - Verify Your Email`;
+            const templateData = {
+                userName: foundUser.name,
+                verificationCode: verificationtoken, // Include token in template
+            };
+            await sendEmail(foundUser.email, emailSubject, 'loginAndVerify', templateData);
+        } catch (emailError) {
+            console.error(`Failed to send verify email to ${foundUser.email}:`, emailError);
+            return logError(res, new InternalServerError(`Failed to send verify email to ${foundUser.email}`));
+        }
     }
 
     req.session.user = {
@@ -294,52 +320,63 @@ export const forgotPassword = asyncHandler(
     async (req: Request, res: Response) => {
         const data = req.body;
 
-        const foundUser = await userModel.findOne({
-            email: data.email,
-        });
-
+        const foundUser = await userModel.findOne({ email: data.email });
         if (!foundUser)
             return logError(res, new NotFoundError(`Account not found`));
 
-        foundUser.passwordResetToken = generatePasswordResetLink(foundUser._id);
+        const token = generateToken(foundUser._id); // or your token generation logic
+        foundUser.passwordResetToken = token;
+        await foundUser.save();
 
-        const passwordResetLink = generatePasswordResetLink(foundUser._id);
+        const passwordResetLink = `${process.env.CLIENT_URL}/auth/reset-password?token=${token}`;
 
-        await emailService.sendPasswordResetRequest(
-            foundUser,
-            passwordResetLink
-        );
+        // Send password reset email
+        try {
+            const emailSubject = `Reset Your Password - Hedgeon Finance Capital`;
+            const templateData = {
+                userName: foundUser.name,
+                passwordResetLink,
+            };
+            await sendEmail(foundUser.email, emailSubject, 'forgotPassword', templateData);
+        } catch (emailError) {
+            console.error(`Failed to send password reset email to ${foundUser.email}:`, emailError);
+            return logError(res, new InternalServerError(`Failed to send password reset email to ${foundUser.email}`));
+        }
 
         return logData(res, 200, {
-            message: "Password reset token sent to the email address",
-            passwordResetLink,
+            message: "A password reset link has been sent to your email address.",
         });
     }
 );
 
 export const resetPassword = asyncHandler(
     async (req: Request, res: Response) => {
-        const { password } = req.body;
-        const token = req.params.token;
+        const { newPassword, token } = req.body;
 
         const decoded = verifyToken(token, process.env.JWT_SECRET!);
         if (!decoded)
-            return logError(
-                res,
-                new BadRequestError("Invalid password reset link")
-            );
+            return logError(res, new BadRequestError("Invalid or expired password reset link."));
 
-        const user = await userModel.findOne({
-            passwordResetToken: token,
-        });
-        if (!user) return logError(res, new NotFoundError("User not found!"));
+        const user = await userModel.findOne({ passwordResetToken: token });
+        if (!user) return logError(res, new NotFoundError("User not found."));
 
-        user.password = password;
+        user.password = newPassword;
         user.passwordResetToken = null;
+        await user.save();
 
-        await user?.save();
+        // Send confirmation email
+        try {
+            const emailSubject = `Your Password Has Been Reset - Hedgeon Finance Capital`;
+            const templateData = { userName: user.name };
+            await sendEmail(user.email, emailSubject, 'resetPasswordComplete', templateData);
+        } catch (emailError) {
+            console.error(`Failed to send password reset confirmation to ${user.email}:`, emailError);
+            return logError(res, new InternalServerError(`Failed to send confirmation email to ${user.email}`));
+        }
 
-        return logData(res, 200, { message: "Password reset successful" });
+        return logData(res, 200, {
+            message: "Your password has been reset successfully. You can now log in with your new password.",
+        });
     }
 );
 
@@ -347,15 +384,60 @@ export const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
     const { token } = req.body;
 
     const user = await userModel.findOne({ emailVerificationToken: token });
-    if (!user) return logError(res, new BadRequestError("Invalid Token!"));
+    if (!user) return logError(res, new BadRequestError("The verification code is invalid or has expired."));
 
     if (user.isVerified) {
-        return logError(res, new ConflictError("Email already verified"));
+        return logError(res, new ConflictError("Your email has already been verified."));
     }
 
     user.isVerified = true;
     user.emailVerificationToken = null;
     await user.save();
 
-    return logData(res, 200, { message: "Email verified successfully" });
+    // Send welcome email
+    try {
+        const emailSubject = `Your Email Has Been Verified - Hedgeon Finance Capital`;
+        const templateData = { userName: user.name };
+        await sendEmail(user.email, emailSubject, 'verifyEmailComplete', templateData);
+    } catch (emailError) {
+        console.error(`Failed to send verification confirmation to ${user.email}:`, emailError);
+        return logError(res, new InternalServerError(`Failed to send verification email to ${user.email}`));
+    }
+
+    return logData(res, 200, {
+        message: "Your email has been successfully verified.",
+    });
+});
+
+export const resendVerificationEmail = asyncHandler(async (req: Request, res: Response) => {
+    const { email } = req.body;
+    if (!email) return logError(res, new BadRequestError("Email address is required."));
+
+    const user = await userModel.findOne({ email });
+    if (!user) return logError(res, new BadRequestError("No user found with the provided email."));
+
+    if (user.isVerified) {
+        return logError(res, new ConflictError("Your email has already been verified."));
+    }
+
+    const verificationToken = generateVerificationToken();
+    user.emailVerificationToken = verificationToken;
+    await user.save();
+
+    // Send verification email
+    try {
+        const emailSubject = `Verify Your Email Address - Hedgeon Finance Capital`;
+        const templateData = {
+            userName: user.name,
+            verificationCode: verificationToken,
+        };
+        await sendEmail(user.email, emailSubject, 'loginAndVerify', templateData);
+    } catch (emailError) {
+        console.error(`Failed to send verification email to ${user.email}:`, emailError);
+        return logError(res, new InternalServerError(`Failed to resend verification email.`));
+    }
+
+    return logData(res, 200, {
+        message: "A new verification code has been sent to your email.",
+    });
 });

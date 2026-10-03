@@ -1,42 +1,124 @@
-import { FiFileText } from 'react-icons/fi';
+'use client';
 
-const InvestmentList = () => {
+import React, { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { differenceInDays, format, isAfter } from 'date-fns';
+import { Clock, TrendingUp, FileText } from 'lucide-react';
+import { getAllInvestments } from '@/app/api/userApi';
+
+interface Plan {
+    id: string;
+    name: string;
+    investedAmount: number;
+    roi: number;
+    startDate: string | Date;
+    endDate: string | Date;
+}
+
+export default function InvestmentHistory() {
+    const [plans, setPlans] = useState<Plan[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        const fetchInvestments = async () => {
+            try {
+                const res = await getAllInvestments();
+                console.log(res.data['investments'])
+                setPlans(res.data['investments']); // Make sure res.data is an array of Plan
+            } catch (error) {
+                console.error('Failed to fetch investments:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchInvestments();
+    }, []);
+
+    const completedPlans = plans.filter(plan => isAfter(new Date(), new Date(plan.endDate)));
+
+    const getDuration = (startDate: string | Date, endDate: string | Date) => {
+        const totalDays = differenceInDays(new Date(endDate), new Date(startDate));
+        return totalDays >= 365
+            ? `${Math.floor(totalDays / 365)} year(s)`
+            : `${totalDays} day(s)`;
+    };
+
+    if (loading) {
+        return (
+            <div className="text-center py-12 text-gray-500">
+                <p>Loading investment history...</p>
+            </div>
+        );
+    }
+
+    if (!completedPlans.length) {
+        return (
+            <div className="text-center py-12 text-gray-500">
+                <p>No investment history available yet.</p>
+            </div>
+        );
+    }
 
     return (
-        <div className="p-8 bg-gray-50">
+        <div className="p-8 bg-gray-50 min-h-screen">
             <div className="max-w-6xl mx-auto">
-                <h1 className="text-3xl font-bold mb-8">My Investments</h1>
+                <h1 className="text-3xl font-bold mb-8">Investment History</h1>
 
-                {/* Past Investments */}
-                <div>
-                    <h2 className="text-xl font-semibold mb-6">Investment History</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {[1, 2, 3].map(id => (
-                            <div key={id} className="bg-white p-6 rounded-xl shadow-sm">
-                                <div className="flex justify-between mb-4">
-                                    <h3 className="font-semibold">Emerging Markets Fund</h3>
-                                    <span className="text-sm px-2 py-1 bg-red-100 text-red-800 rounded-full">Closed</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {completedPlans.map(plan => (
+                        <div key={plan.id} className="bg-white shadow-lg hover:shadow-xl transition-shadow rounded-2xl p-6 border border-gray-50 relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-full h-1.5 bg-gray-100">
+                                <div className="h-full bg-green-500" style={{ width: `100%` }} />
+                            </div>
+
+                            <div className="flex items-start justify-between mb-4">
+                                <div>
+                                    <h2 className="text-xl font-bold text-gray-900">{plan.name}</h2>
+                                    <p className="text-sm text-gray-500 mt-1">
+                                        {format(new Date(plan.startDate), 'MMM yyyy')} - {format(new Date(plan.endDate), 'MMM yyyy')}
+                                    </p>
                                 </div>
-                                <div className="space-y-2">
-                                    <div className="flex justify-between">
-                                        <span>Final Value:</span>
-                                        <span className="font-semibold">$22,450</span>
+                                <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    Completed
+                                </span>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                                    <div>
+                                        <p className="text-xs text-gray-500 mb-1">Invested</p>
+                                        <p className="font-semibold text-gray-900">${plan.investedAmount.toLocaleString()}</p>
                                     </div>
-                                    <div className="flex justify-between">
-                                        <span>Duration:</span>
-                                        <span>3 years</span>
+                                    <div className="text-right">
+                                        <p className="text-xs text-gray-500 mb-1">ROI</p>
+                                        <p className="font-semibold text-green-600 flex items-center gap-1">
+                                            <TrendingUp className="w-4 h-4" />
+                                            ${plan.roi.toLocaleString()}
+                                        </p>
                                     </div>
-                                    <button className="w-full mt-4 flex items-center justify-center text-blue-600 hover:bg-blue-50 py-2 rounded-lg">
-                                        <FiFileText className="mr-2" /> View Documents
-                                    </button>
+                                </div>
+
+                                <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                                    <div className="flex items-center gap-2">
+                                        <Clock className="w-5 h-5 text-gray-400" />
+                                        <span className="text-sm font-medium text-gray-700">
+                                            Duration: {getDuration(plan.startDate, plan.endDate)}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        ))}
-                    </div>
+
+                            <div className="mt-6">
+                                <Button variant="ghost" className="w-full flex items-center justify-center gap-2 text-blue-600 hover:bg-blue-50">
+                                    <FileText className="w-5 h-5" />
+                                    View Documents
+                                </Button>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>
     );
-};
-
-export default InvestmentList;
+}

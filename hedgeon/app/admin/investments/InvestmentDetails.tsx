@@ -16,6 +16,7 @@ import {
 } from '@/app/api/adminApi'; // Import the new API functions
 import { StopCircleIcon } from 'lucide-react';
 
+
 const InvestmentDetails: React.FC<{
     investment: any;
     onBack: () => void;
@@ -25,6 +26,7 @@ const InvestmentDetails: React.FC<{
     const [editMode, setEditMode] = useState(false);
     const [localInvestment, setLocalInvestment] = useState<any>(investment); // State for editable fields
     const initialInvestment = React.useRef<any>(investment); // Store the initial investment data
+    const [api, contextHolder] = notification.useNotification();
 
     // Initialize localInvestment and initialInvestment when the investment prop changes
     useEffect(() => {
@@ -41,7 +43,7 @@ const InvestmentDetails: React.FC<{
             console.log('Updating investment status to:', newStatus);
             const reponse = await updateInvestmentStatusAdminApi(investment._id, newStatus);
             console.log(reponse.data);
-            notification.success({
+            api.success({
                 message: 'Success',
                 description: `Investment status updated to ${newStatus}`,
             });
@@ -49,7 +51,7 @@ const InvestmentDetails: React.FC<{
             setLocalInvestment({ ...localInvestment, status: newStatus });
             onUpdate();
         } catch (error: any) {
-            notification.error({
+            api.error({
                 message: 'Error',
                 description: `Failed to update investment status: ${error.message}`,
             });
@@ -90,16 +92,16 @@ const InvestmentDetails: React.FC<{
             const response = await updateInvestmentAdminApi(investment._id, updatedInvestmentData);
             console.log(response.data);
 
-            notification.success({
+            api.success({
                 message: 'Success',
                 description: 'Investment details updated',
             });
             setEditMode(false);
             onUpdate(); // Refresh
         } catch (error: any) {
-            notification.error({
+            api.error({
                 message: 'Error',
-                description: `Failed to update investment details: ${error.message}`,
+                description: `Failed to update investment details! Session expired!`,
             });
         } finally {
             setLoading(false);
@@ -134,10 +136,12 @@ const InvestmentDetails: React.FC<{
                 <ArrowLeftOutlined /> Back to List
             </Button>
 
+            {contextHolder}
+
             <Card title="Investment Details">
                 <Descriptions bordered>
                     <Descriptions.Item label="User">
-                        {localInvestment.user.name} ({localInvestment.user.email})
+                        {localInvestment.user?.name} ({localInvestment.user?.email})
                     </Descriptions.Item>
                     <Descriptions.Item label="Plan">{localInvestment.plan.name}</Descriptions.Item>
                     <Descriptions.Item label="Amount">
