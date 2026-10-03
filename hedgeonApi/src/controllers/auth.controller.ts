@@ -91,7 +91,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     }
 
     // Create user
-    const user = await userModel.create({ ...data, role: userRole }); // Use the determined role
+    const user = await userModel.create({ ...data, isVerified:true, role: userRole }); // Use the determined role
 
     // Update the referrer's referral list if a referrer exists
     if (referrerUser) {
