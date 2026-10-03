@@ -111,17 +111,17 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     user.emailVerificationToken = verificationtoken;
 
     // Send welcome + verification email
-    try {
-        const emailSubject = `Welcome to Hedgeon Finance Capital - Verify Your Email`;
-        const templateData = {
-            userName: user.name || 'User',
-            verificationCode: verificationtoken
-        };
-        await sendEmail(user.email, emailSubject, 'welcomeAndVerify', templateData); // Use your combined template name here
-    } catch (emailError) {
-        console.error(`Failed to send welcome email to ${user.email}:`, emailError);
-        return logError(res, new InternalServerError(`Failed to send welcome email to ${user.email}`));
-    }
+    // try {
+    //     const emailSubject = `Welcome to Hedgeon Finance Capital - Verify Your Email`;
+    //     const templateData = {
+    //         userName: user.name || 'User',
+    //         verificationCode: verificationtoken
+    //     };
+    //     await sendEmail(user.email, emailSubject, 'welcomeAndVerify', templateData); // Use your combined template name here
+    // } catch (emailError) {
+    //     console.error(`Failed to send welcome email to ${user.email}:`, emailError);
+    //     return logError(res, new InternalServerError(`Failed to send welcome email to ${user.email}`));
+    // }
 
     // Generate tokens
     const accessToken = generateAccessToken({
@@ -188,16 +188,16 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     }
 
     // Send welcome + verification email
-    try {
-        const emailSubject = `Welcome to Hedgeon Finance Capital - Verify Your Email`;
-        const templateData = {
-            userName: foundUser.name
-        };
-        await sendEmail(foundUser.email, emailSubject, 'login', templateData); // Use your combined template name here
-    } catch (emailError) {
-        console.error(`Failed to send login email to ${foundUser.email}:`, emailError);
-        return logError(res, new InternalServerError(`Failed to send login email to ${foundUser.email}`));
-    }
+    // try {
+    //     const emailSubject = `Welcome to Hedgeon Finance Capital - Verify Your Email`;
+    //     const templateData = {
+    //         userName: foundUser.name
+    //     };
+    //     await sendEmail(foundUser.email, emailSubject, 'login', templateData); // Use your combined template name here
+    // } catch (emailError) {
+    //     console.error(`Failed to send login email to ${foundUser.email}:`, emailError);
+    //     return logError(res, new InternalServerError(`Failed to send login email to ${foundUser.email}`));
+    // }
 
     const accessToken = generateAccessToken({
         id: foundUser._id,
